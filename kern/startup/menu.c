@@ -290,6 +290,20 @@ cmd_quit(int nargs, char **args)
 }
 
 /*
+ * Command for enable debugging flags of debugging thread(dth).
+ */
+static
+int
+cmd_enableDebuggingThreadFlags(int nargs, char **args)
+{
+	(void)nargs;
+	(void)args;
+
+	uint32_t dbflags = 1;
+	return 0;
+}
+
+/*
  * Command for mounting a filesystem.
  */
 
@@ -548,6 +562,7 @@ static struct {
 	{ "sync",	cmd_sync },
 	{ "panic",	cmd_panic },
 	{ "q",		cmd_quit },
+	{ "dth",	cmd_enableDebuggingThreadFlags},
 	{ "exit",	cmd_quit },
 	{ "halt",	cmd_quit },
 
