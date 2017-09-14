@@ -299,8 +299,7 @@ cmd_enableDebuggingThreadFlags(int nargs, char **args)
 	(void)nargs;
 	(void)args;
 
-	dbflags = 1;
-	kprintf ("%d\n", dbflags);
+	dbflags = DB_THREADS;
 	return 0;
 }
 
@@ -452,7 +451,7 @@ static const char *opsmenu[] = {
 	"[sync]    Sync filesystems          ",
 	"[panic]   Intentional panic         ",
 	"[q]       Quit and shut down        ",
-	"[dth]	   Enable debugging messages output of type DB THREADS",
+	"[dth]	   Enable debugging output of type DB THREADS",
 	NULL
 };
 
