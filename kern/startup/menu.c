@@ -290,7 +290,7 @@ cmd_quit(int nargs, char **args)
 }
 
 /*
- * Command for enable debugging flags of debugging thread(dth).
+ * Command to enable debugging flags of debugging thread(dth).
  */
 static
 int
@@ -299,7 +299,7 @@ cmd_enableDebuggingThreadFlags(int nargs, char **args)
 	(void)nargs;
 	(void)args;
 
-	uint32_t dbflags = 1;
+	dbflags = 1;
 	return 0;
 }
 
