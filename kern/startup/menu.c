@@ -299,7 +299,7 @@ cmd_enableDebuggingThreadFlags(int nargs, char **args)
 	(void)nargs;
 	(void)args;
 
-	uint32_t dbflags = 1;
+	dbflags = 1;
 	return 0;
 }
 
