@@ -451,7 +451,7 @@ static const char *opsmenu[] = {
 	"[sync]    Sync filesystems          ",
 	"[panic]   Intentional panic         ",
 	"[q]       Quit and shut down        ",
-	"[dth]	   Enable debugging output of type DB THREADS",
+	"[dth]	   Enable debugging of type DB THREADS",
 	NULL
 };
 
