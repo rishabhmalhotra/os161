@@ -300,6 +300,7 @@ cmd_enableDebuggingThreadFlags(int nargs, char **args)
 	(void)args;
 
 	dbflags = 1;
+	kprintf ("%d\n", dbflags);
 	return 0;
 }
 
