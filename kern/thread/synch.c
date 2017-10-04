@@ -164,6 +164,14 @@ lock_create(const char *name)
         }
         
         // add stuff here as needed
+        spinlock_init(&lock->s_lock);
+
+        lock->wchan = wchan_create(lock->lk_name);
+        if (lock->wchan == NULL) {
+            kfree(lock->lk_name);
+            kfree(lock);
+            return NULL;
+        }
         
         return lock;
 }
@@ -174,7 +182,11 @@ lock_destroy(struct lock *lock)
         KASSERT(lock != NULL);
 
         // add stuff here as needed
-        
+        /* wchan_cleanup will assert if anyone's waiting on it */
+        spinlock_cleanup(&lock->s_lock);
+        wchan_destroy(lock->wchan);
+        lock->holder = NULL;
+
         kfree(lock->lk_name);
         kfree(lock);
 }
@@ -182,27 +194,45 @@ lock_destroy(struct lock *lock)
 void
 lock_acquire(struct lock *lock)
 {
-        // Write this
+        spinlock_acquire(&lock->s_lock);
+        while (lock->holder != NULL) {
+            wchan_lock(lock->wchan);
+            spinlock_release(&lock->s_lock);
+            wchan_sleep(lock->wchan);
+            spinlock_acquire(&lock->s_lock);
+        }
+        lock->holder = curthread;
+        spinlock_release(&lock->s_lock);
 
-        (void)lock;  // suppress warning until code gets written
+        //(void)lock;  // suppress warning until code gets written
 }
 
 void
 lock_release(struct lock *lock)
 {
-        // Write this
+        spinlock_acquire(&lock->s_lock);
+        KASSERT(lock->holder == curthread);         // thread calling this should be thread holding lock
+        lock->holder = NULL;                        // release lock
 
-        (void)lock;  // suppress warning until code gets written
+        // wake wchan (if some other thread is waiting in while for lock_acquire):
+        wchan_wakeone(lock->wchan);
+        spinlock_release(&lock->s_lock);
+
+        //(void)lock;  // suppress warning until code gets written
 }
 
 bool
 lock_do_i_hold(struct lock *lock)
 {
-        // Write this
+        if (lock->holder == curthread) {
+            return true;
+        } else {
+            return false;
+        }
 
-        (void)lock;  // suppress warning until code gets written
+        //(void)lock;  // suppress warning until code gets written
 
-        return true; // dummy until code gets written
+        //return true; // dummy until code gets written
 }
 
 ////////////////////////////////////////////////////////////
