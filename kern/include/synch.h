@@ -79,7 +79,7 @@ struct lock {
 
         struct spinlock s_lock;
         struct wchan* wchan;
-        struct thread* volatile s_holder;
+        struct thread* volatile holder;
 };
 
 struct lock *lock_create(const char *name);
