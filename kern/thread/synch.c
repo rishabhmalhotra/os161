@@ -276,22 +276,39 @@ void
 cv_wait(struct cv *cv, struct lock *lock)
 {
         // Write this
-        (void)cv;    // suppress warning until code gets written
-        (void)lock;  // suppress warning until code gets written
+        // must be called from within a critical section:
+        KASSERT(lock_do_i_hold(lock) == true);
+
+        lock_release(lock);
+        wchan_lock(lock->wchan);
+        // lock_release(lock);
+        wchan_sleep(lock->wchan);
+        // doubt:
+        lock_acquire(lock->wchan);
+
+        //(void)cv;    // suppress warning until code gets written
+        //(void)lock;  // suppress warning until code gets written
 }
 
 void
 cv_signal(struct cv *cv, struct lock *lock)
 {
         // Write this
-	(void)cv;    // suppress warning until code gets written
-	(void)lock;  // suppress warning until code gets written
+        KASSERT(lock_do_i_hold(lock) == true);
+
+        wchan_wakeone(lock->wchan);
+
+	   //(void)cv;    // suppress warning until code gets written
+	   //(void)lock;  // suppress warning until code gets written
 }
 
 void
 cv_broadcast(struct cv *cv, struct lock *lock)
 {
-	// Write this
-	(void)cv;    // suppress warning until code gets written
-	(void)lock;  // suppress warning until code gets written
+	   // Write this
+        KASSERT(lock_do_i_hold(lock) == true);
+
+        wchan_wakeall(lock->wchan);
+	   //(void)cv;    // suppress warning until code gets written
+	   //(void)lock;  // suppress warning until code gets written
 }
