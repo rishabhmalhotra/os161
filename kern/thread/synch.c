@@ -257,6 +257,12 @@ cv_create(const char *name)
         }
         
         // add stuff here as needed
+        cv->cv_wchan = wchan_create(cv->cv_name);
+        if (cv->cv_wchan == NULL) {
+            kfree(cv->cv_name);
+            kfree(cv);
+            return NULL;
+        }
         
         return cv;
 }
@@ -269,6 +275,7 @@ cv_destroy(struct cv *cv)
         // add stuff here as needed
         
         kfree(cv->cv_name);
+        wchan_destroy(cv->cv_wchan);
         kfree(cv);
 }
 
@@ -276,15 +283,14 @@ void
 cv_wait(struct cv *cv, struct lock *lock)
 {
         // Write this
-        // must be called from within a critical section:
+        // must be called from within a critical section, even if after being woken up:
         KASSERT(lock_do_i_hold(lock) == true);
+        if (lock_do_i_hold(lock) == false) {
+            lock_acquire(lock)
+        }
 
-        lock_release(lock);
-        wchan_lock(lock->wchan);
-        // lock_release(lock);
-        wchan_sleep(lock->wchan);
-        // doubt:
-        lock_acquire(lock->wchan);
+        wchan_lock(cv->cv_wchan);
+        wchan_sleep(cv->cv_wchan);
 
         //(void)cv;    // suppress warning until code gets written
         //(void)lock;  // suppress warning until code gets written
@@ -294,9 +300,10 @@ void
 cv_signal(struct cv *cv, struct lock *lock)
 {
         // Write this
+        // must be called from within a critical section:
         KASSERT(lock_do_i_hold(lock) == true);
 
-        wchan_wakeone(lock->wchan);
+        wchan_wakeone(cv->cv_wchan);
 
 	   //(void)cv;    // suppress warning until code gets written
 	   //(void)lock;  // suppress warning until code gets written
@@ -306,9 +313,10 @@ void
 cv_broadcast(struct cv *cv, struct lock *lock)
 {
 	   // Write this
+       // must be called from within a critical section:
         KASSERT(lock_do_i_hold(lock) == true);
 
-        wchan_wakeall(lock->wchan);
+        wchan_wakeall(cv->cv_wchan);
 	   //(void)cv;    // suppress warning until code gets written
 	   //(void)lock;  // suppress warning until code gets written
 }
