@@ -286,7 +286,7 @@ cv_wait(struct cv *cv, struct lock *lock)
         // must be called from within a critical section, even if after being woken up:
         KASSERT(lock_do_i_hold(lock) == true);
         if (lock_do_i_hold(lock) == false) {
-            lock_acquire(lock)
+            lock_acquire(lock);
         }
 
         wchan_lock(cv->cv_wchan);
