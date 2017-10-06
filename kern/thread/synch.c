@@ -292,7 +292,7 @@ cv_wait(struct cv *cv, struct lock *lock)
         wchan_lock(cv->cv_wchan);
         lock_release(lock);
         wchan_sleep(cv->cv_wchan);
-        //lock_acquire(lock);// & test
+        lock_acquire(lock);
 
         //(void)cv;    // suppress warning until code gets written
         //(void)lock;  // suppress warning until code gets written
