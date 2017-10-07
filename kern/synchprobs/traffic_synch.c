@@ -64,7 +64,7 @@ checkConditions(Vehicle *v1, Vehicle *v2) {
   if ((v1->origin == v2->origin) ||
       ((v1->origin == v2->destination) && (v1->destination == v2->origin)) ||
       ((v1->destination != v2->destination) && 
-        ((isVehicleMakingRightTurn(v1) || (isVehicleMakingRightTurn(v2)))))) {
+        (isVehicleMakingRightTurn(v1) || (isVehicleMakingRightTurn(v2))))) {
         return true;
       } else {
         return false;
