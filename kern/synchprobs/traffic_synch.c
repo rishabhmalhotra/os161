@@ -3,6 +3,7 @@
 #include <synchprobs.h>
 #include <synch.h>
 #include <opt-A1.h>
+#include <array.h>
 
 /* 
  * This simple default synchronization mechanism allows only vehicle at a time
@@ -18,10 +19,72 @@
  * declare other global variables if your solution requires them.
  */
 
-/*
- * replace this with declarations of any synchronization and other variables you need here
- */
-static struct semaphore *intersectionSem;
+// CV:
+static struct cv *intersectionCV;
+
+// Global var for CV (represents no of vehicles in array vehicles/no of vehicles on the roads):
+volatile int totalVehicles = 0;
+
+// Lock for CV:
+static struct lock *mutex;
+
+typedef struct Vehicle
+{
+  Direction origin;
+  Direction destination;
+} Vehicle;
+
+bool checkConditions(Vehicle *v1, Vehicle *v2);       // true if any of the assignment conds. satisfied
+
+bool isVehivleMakingRightTurn(Vehicle *v);            // helper for checkConditions, is v making a right turn
+
+bool perVehicleConditionCheck(Vehicle *v);            // for each vehicle, if conditionCheck is false, cv_wait
+
+
+// array of vehicles for perVehicleCheck():
+struct array *vehicles;
+
+// my helpers:
+
+bool
+isVehicleMakingRightTurn(Vehicle *v) {
+  //all true conditions for right turn:
+  if (((v->origin == north) && (v->destination == west)) ||
+      ((v->origin == west) && (v->destination == south)) ||
+      ((v->origin == south) && (v->destination == east)) ||
+      ((v->origin == east) && (v->destination == north))) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool
+checkConditions(Vehicle *v1, Vehicle *v2) {
+  if ((v1->origin == v2->origin) ||
+      ((v1->origin == v2->destination) && (v1->destination == v2->origin)) ||
+      ((v1->destination != v2->destination) && 
+        ((isVehicleMakingRightTurn(v1) || (isVehicleMakingRightTurn(v2)))))) {
+        return true;
+      } else {
+        return false;
+      }
+}
+
+bool
+perVehicleConditionCheck(Vehicle *v) {
+  for (unsigned int i=0; i<array_num(vehicles); i++) {
+    if (checkConditions(vehicle, array_get(vehicles, i)) == false) {
+      cv_wait(intersectionCV, mutex);
+      return false;
+    }
+  }
+
+  // verify curthread is lock owner:
+  KASSERT(lock_do_i_hold(mutex));
+  totalVehicles++;
+  return true;
+}
 
 
 /* 
@@ -36,10 +99,27 @@ intersection_sync_init(void)
 {
   /* replace this default implementation with your own implementation */
 
-  intersectionSem = sem_create("intersectionSem",1);
-  if (intersectionSem == NULL) {
-    panic("could not create intersection semaphore");
+  kprintf("intersection_sync_init starting\n");
+
+  // create CV for intersection:
+  intersectionCV = cv_create("intersectionCV");
+  if (intersectionCV == NULL) {
+    panic("couldn't create intersection CV");
   }
+
+  // create lock for above CV:
+  mutex = lock_create("mutex");
+  if (mutex == NULL) {
+    pamic("couldn't create mutex")
+  }
+
+  // array for perVehicleCheck():
+  vehicles = array_create();
+  array_init(vehicles);
+  if (vehicles == NULL) {
+    pamic("couldn't create vehicles[]")
+  }
+
   return;
 }
 
@@ -53,9 +133,13 @@ intersection_sync_init(void)
 void
 intersection_sync_cleanup(void)
 {
-  /* replace this default implementation with your own implementation */
-  KASSERT(intersectionSem != NULL);
-  sem_destroy(intersectionSem);
+  KASSERT(intersectionCV != NULL);
+  KASSERT(mutex != NULL);
+  KASSERT(vehicles != NULL);
+
+  lock_destroy(mutex);
+  cv_destroy(intersectionCV);
+  array_destroy(vehicles);
 }
 
 
@@ -76,10 +160,28 @@ void
 intersection_before_entry(Direction origin, Direction destination) 
 {
   /* replace this default implementation with your own implementation */
-  (void)origin;  /* avoid compiler complaint about unused parameter */
-  (void)destination; /* avoid compiler complaint about unused parameter */
-  KASSERT(intersectionSem != NULL);
-  P(intersectionSem);
+  //(void)origin;  /* avoid compiler complaint about unused parameter */
+  //(void)destination; /* avoid compiler complaint about unused parameter */
+
+  KASSERT(intersectionCV != NULL);
+  KASSERT(mutex != NULL);
+  //KASSERT(vehicles != NULL);
+
+  lock_acquire(mutex);
+
+  // make vehicle
+  Vehicle *v = kmalloc(sizeof(struct Vehicle));
+  KASSERT(v != NULL);
+  v->origin = origin;
+  v->destination = destination;
+
+  // perVehicleConditionCheck checks conditions of this v with every other existing v:
+  while (perVehicleConditionCheck(v) == false) {
+    // do nothing, don't increment totalVehicles, just inside here
+  }
+  // add v to array for future per vehicle checks:
+  array_add(vehicles, v, NULL);
+  lock_release(mutex);
 }
 
 
@@ -97,9 +199,21 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination) 
 {
-  /* replace this default implementation with your own implementation */
-  (void)origin;  /* avoid compiler complaint about unused parameter */
-  (void)destination; /* avoid compiler complaint about unused parameter */
-  KASSERT(intersectionSem != NULL);
-  V(intersectionSem);
+  KASSERT(intersectionCV != NULL);
+  KASSERT(mutex != NULL);
+
+  lock_acquire(mutex);
+
+  // chuck out exiting vehicle from array to keep vehicles[] relevant:
+  for (unsigned int i=0; i<array_num(vehicles); i++) {
+    Vehicle *v = array_get(vehicles, i);
+    if ((v->origin = origin) && (v->destination = destination)) {
+      array_remove(vehicles, i);
+      cv_broadcast(intersectionCV, mutex);
+      // 1 vehicle gone from the picture, loop ends since v chucked out
+      totalVehicles --;
+      break;
+    }
+  }
+  loack_release(mutex);
 }
