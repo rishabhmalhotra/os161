@@ -76,14 +76,16 @@ perVehicleConditionCheck(Vehicle *v) {
   for (unsigned int i=0; i<array_num(vehicles); i++) {
     if (checkConditions(v, array_get(vehicles, i)) == false) {
       cv_wait(intersectionCV, mutex);
+      kprintf("returning false from perVehcheck\n");
       return false;
     }
   }
 
   // verify curthread is lock owner:
   KASSERT(lock_do_i_hold(mutex));
-  totalVehicles++;
   array_add(vehicles, v, NULL);
+  totalVehicles++;
+  kprintf("returning true from perVehcheck\n");
   return true;
 }
 
@@ -164,15 +166,12 @@ intersection_before_entry(Direction origin, Direction destination)
   kprintf("before_entry KASSERTS complete\n");
 
   lock_acquire(mutex);
-  kprintf("before_entry mutex acquired\n");
 
   // make vehicle
   Vehicle *v = kmalloc(sizeof(struct Vehicle));
   KASSERT(v != NULL);
   v->origin = origin;
   v->destination = destination;
-
-  kprintf("before_entry Vehicle *v made\n");
 
   // perVehicleConditionCheck checks conditions of this v with every other existing v:
   while (perVehicleConditionCheck(v) == false) {
