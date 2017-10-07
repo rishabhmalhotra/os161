@@ -36,7 +36,7 @@ typedef struct Vehicle
 
 bool checkConditions(Vehicle *v1, Vehicle *v2);       // true if any of the assignment conds. satisfied
 
-bool isVehivleMakingRightTurn(Vehicle *v);            // helper for checkConditions, is v making a right turn
+bool isVehicleMakingRightTurn(Vehicle *v);            // helper for checkConditions, is v making a right turn
 
 bool perVehicleConditionCheck(Vehicle *v);            // for each vehicle, if conditionCheck is false, cv_wait
 
@@ -83,6 +83,7 @@ perVehicleConditionCheck(Vehicle *v) {
   // verify curthread is lock owner:
   KASSERT(lock_do_i_hold(mutex));
   totalVehicles++;
+  array_add(vehicles, v, NULL);
   return true;
 }
 
@@ -179,8 +180,7 @@ intersection_before_entry(Direction origin, Direction destination)
   while (perVehicleConditionCheck(v) == false) {
     // do nothing, don't increment totalVehicles, just inside here
   }
-  // add v to array for future per vehicle checks:
-  array_add(vehicles, v, NULL);
+  // added v to array for future per vehicle checks
   lock_release(mutex);
 }
 
