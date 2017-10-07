@@ -64,7 +64,7 @@ checkConditions(Vehicle *v1, Vehicle *v2) {
   if ((v1->origin == v2->origin) ||
       ((v1->origin == v2->destination) && (v1->destination == v2->origin)) ||
       ((v1->destination != v2->destination) && 
-        (isVehicleMakingRightTurn(v1) || (isVehicleMakingRightTurn(v2))))) {
+        ((isVehicleMakingRightTurn(v1) || (isVehicleMakingRightTurn(v2)))))) {
         return true;
       } else {
         return false;
@@ -98,10 +98,6 @@ perVehicleConditionCheck(Vehicle *v) {
 void
 intersection_sync_init(void)
 {
-  /* replace this default implementation with your own implementation */
-
-  kprintf("intersection_sync_init starting\n");
-
   // create CV for intersection:
   intersectionCV = cv_create("intersectionCV");
   if (intersectionCV == NULL) {
@@ -134,9 +130,6 @@ intersection_sync_init(void)
 void
 intersection_sync_cleanup(void)
 {
-
-  kprintf("Entered intersection_sync_cleanup\n");
-
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
   KASSERT(vehicles != NULL);
