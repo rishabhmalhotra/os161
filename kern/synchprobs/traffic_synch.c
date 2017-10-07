@@ -22,9 +22,6 @@
 // CV:
 static struct cv *intersectionCV;
 
-// Global var for CV (represents no of vehicles in array vehicles/no of vehicles on the roads):
-volatile int totalVehicles = 0;
-
 // Lock for CV:
 static struct lock *mutex;
 
@@ -43,6 +40,9 @@ bool perVehicleConditionCheck(Vehicle *v);            // for each vehicle, if co
 
 // array of vehicles for perVehicleCheck():
 struct array *vehicles;
+
+// Global var for CV (represents no of vehicles in array vehicles/no of vehicles on the roads):
+volatile int totalVehicles = 0;
 
 // my helpers:
 
@@ -107,12 +107,14 @@ intersection_sync_init(void)
   if (intersectionCV == NULL) {
     panic("couldn't create intersection CV");
   }
+  kprintf("created intersectionCV\n");
 
   // create lock for above CV:
   mutex = lock_create("mutex");
   if (mutex == NULL) {
     panic("couldn't create mutex");
   }
+  kprintf("Created mutex\n");
 
   // array for perVehicleCheck():
   vehicles = array_create();
@@ -120,6 +122,7 @@ intersection_sync_init(void)
   if (vehicles == NULL) {
     panic("couldn't create vehicles[]");
   }
+  kprintf("Created vehicles[] array\n");
 
   return;
 }
