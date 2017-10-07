@@ -71,6 +71,22 @@ checkConditions(Vehicle *v1, Vehicle *v2) {
       }
 }
 
+bool
+perVehicleConditionCheck(Vehicle *v) {
+  for (unsigned int i=0; i<array_num(vehicles); i++) {
+    if (checkConditions(v, array_get(vehicles, i)) == false) {
+      cv_wait(intersectionCV, mutex);
+      return false;
+    }
+  }
+
+  // verify curthread is lock owner:
+  KASSERT(lock_do_i_hold(mutex));
+  totalVehicles++;
+  array_add(vehicles, v, NULL);
+  return true;
+}
+
 
 /* 
  * The simulation driver will call this function once before starting
@@ -95,33 +111,17 @@ intersection_sync_init(void)
   // create lock for above CV:
   mutex = lock_create("mutex");
   if (mutex == NULL) {
-    pamic("couldn't create mutex")
+    panic("couldn't create mutex");
   }
 
   // array for perVehicleCheck():
   vehicles = array_create();
   array_init(vehicles);
   if (vehicles == NULL) {
-    pamic("couldn't create vehicles[]")
+    panic("couldn't create vehicles[]");
   }
 
   return;
-}
-
-bool
-perVehicleConditionCheck(Vehicle *v) {
-  for (unsigned int i=0; i<array_num(vehicles); i++) {
-    if (checkConditions(vehicle, array_get(vehicles, i)) == false) {
-      cv_wait(intersectionCV, mutex);
-      return false;
-    }
-  }
-
-  // verify curthread is lock owner:
-  KASSERT(lock_do_i_hold(mutex));
-  totalVehicles++;
-  array_add(vehicles, v, NULL);
-  return true;
 }
 
 /* 
