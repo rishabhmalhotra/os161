@@ -162,10 +162,6 @@ intersection_sync_cleanup(void)
 void
 intersection_before_entry(Direction origin, Direction destination) 
 {
-  /* replace this default implementation with your own implementation */
-  //(void)origin;  /* avoid compiler complaint about unused parameter */
-  //(void)destination; /* avoid compiler complaint about unused parameter */
-
   kprintf("intersection_before_entry starting\n");
 
   KASSERT(vehicles != NULL);
@@ -193,7 +189,6 @@ intersection_before_entry(Direction origin, Direction destination)
     kprintf("before_entry inside while pervehicleconditioncheck\n");
   }
 
-  kprintf("before_entry while loop done\n");
   // added v to array for future per vehicle checks
   lock_release(mutex);
 }
@@ -227,6 +222,7 @@ intersection_after_exit(Direction origin, Direction destination)
     Vehicle *v = array_get(vehicles, i);
     if ((v->origin = origin) && (v->destination = destination)) {
       array_remove(vehicles, i);
+      kprintf("broadcasting to CV\n");
       cv_broadcast(intersectionCV, mutex);
       // 1 vehicle gone from the picture, loop ends since v chucked out
       totalVehicles --;
