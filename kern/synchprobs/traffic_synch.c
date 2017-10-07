@@ -107,14 +107,12 @@ intersection_sync_init(void)
   if (intersectionCV == NULL) {
     panic("couldn't create intersection CV");
   }
-  kprintf("created intersectionCV\n");
 
   // create lock for above CV:
   mutex = lock_create("mutex");
   if (mutex == NULL) {
     panic("couldn't create mutex");
   }
-  kprintf("Created mutex\n");
 
   // array for perVehicleCheck():
   vehicles = array_create();
@@ -122,7 +120,6 @@ intersection_sync_init(void)
   if (vehicles == NULL) {
     panic("couldn't create vehicles[]");
   }
-  kprintf("Created vehicles[] array\n");
 
   return;
 }
@@ -174,6 +171,8 @@ intersection_before_entry(Direction origin, Direction destination)
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
+
+  kprintf("before_entry KASSERTS complete\n");
 
   lock_acquire(mutex);
 
