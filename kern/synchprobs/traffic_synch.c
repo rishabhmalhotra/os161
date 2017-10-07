@@ -137,6 +137,9 @@ intersection_sync_init(void)
 void
 intersection_sync_cleanup(void)
 {
+
+  kprintf("Entered intersection_sync_cleanup\n");
+
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
   KASSERT(vehicles != NULL);
@@ -165,6 +168,8 @@ intersection_before_entry(Direction origin, Direction destination)
   /* replace this default implementation with your own implementation */
   //(void)origin;  /* avoid compiler complaint about unused parameter */
   //(void)destination; /* avoid compiler complaint about unused parameter */
+
+  kprintf("intersection_before_entry starting\n");
 
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
@@ -201,6 +206,9 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination) 
 {
+
+  kprintf("intersection_after_exit starting\n");
+
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
 
