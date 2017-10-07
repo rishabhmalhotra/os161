@@ -171,9 +171,9 @@ intersection_before_entry(Direction origin, Direction destination)
 
   kprintf("intersection_before_entry starting\n");
 
+  KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
-  KASSERT(vehicles != NULL);
 
   lock_acquire(mutex);
 
@@ -209,6 +209,7 @@ intersection_after_exit(Direction origin, Direction destination)
 
   kprintf("intersection_after_exit starting\n");
 
+  KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
 
