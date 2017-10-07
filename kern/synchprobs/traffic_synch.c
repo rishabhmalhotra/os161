@@ -71,22 +71,6 @@ checkConditions(Vehicle *v1, Vehicle *v2) {
       }
 }
 
-bool
-perVehicleConditionCheck(Vehicle *v) {
-  for (unsigned int i=0; i<array_num(vehicles); i++) {
-    if (checkConditions(vehicle, array_get(vehicles, i)) == false) {
-      cv_wait(intersectionCV, mutex);
-      return false;
-    }
-  }
-
-  // verify curthread is lock owner:
-  KASSERT(lock_do_i_hold(mutex));
-  totalVehicles++;
-  array_add(vehicles, v, NULL);
-  return true;
-}
-
 
 /* 
  * The simulation driver will call this function once before starting
@@ -124,6 +108,22 @@ intersection_sync_init(void)
   return;
 }
 
+bool
+perVehicleConditionCheck(Vehicle *v) {
+  for (unsigned int i=0; i<array_num(vehicles); i++) {
+    if (checkConditions(vehicle, array_get(vehicles, i)) == false) {
+      cv_wait(intersectionCV, mutex);
+      return false;
+    }
+  }
+
+  // verify curthread is lock owner:
+  KASSERT(lock_do_i_hold(mutex));
+  totalVehicles++;
+  array_add(vehicles, v, NULL);
+  return true;
+}
+
 /* 
  * The simulation driver will call this function once after
  * the simulation has finished
@@ -142,7 +142,6 @@ intersection_sync_cleanup(void)
   cv_destroy(intersectionCV);
   array_destroy(vehicles);
 }
-
 
 /*
  * The simulation driver will call this function each time a vehicle
@@ -215,5 +214,5 @@ intersection_after_exit(Direction origin, Direction destination)
       break;
     }
   }
-  loack_release(mutex);
+  lock_release(mutex);
 }
