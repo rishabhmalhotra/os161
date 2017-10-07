@@ -175,6 +175,7 @@ intersection_before_entry(Direction origin, Direction destination)
   kprintf("before_entry KASSERTS complete\n");
 
   lock_acquire(mutex);
+  kprintf("before_entry mutex acquired\n");
 
   // make vehicle
   Vehicle *v = kmalloc(sizeof(struct Vehicle));
@@ -182,10 +183,16 @@ intersection_before_entry(Direction origin, Direction destination)
   v->origin = origin;
   v->destination = destination;
 
+  kprintf("before_entry Vehicle *v made\n");
+
   // perVehicleConditionCheck checks conditions of this v with every other existing v:
   while (perVehicleConditionCheck(v) == false) {
     // do nothing, don't increment totalVehicles, just inside here
+    int abc = 1;
+    kprintf("before_entry inside while pervehicleconditioncheck\n");
   }
+
+  kprintf("before_entry while loop done\n");
   // added v to array for future per vehicle checks
   lock_release(mutex);
 }
