@@ -174,7 +174,7 @@ lock_create(const char *name)
         }
 
         lock->holder = NULL;
-        lock->count = 1; ////////////////
+        //lock->count = 1; ////////////////
         
         return lock;
 }
@@ -199,14 +199,15 @@ lock_acquire(struct lock *lock)
 {
         KASSERT(!lock_do_i_hold(lock));     // don't already own lock
         spinlock_acquire(&lock->s_lock);
-        while (lock->count == 0) {          //(lock->holder != NULL) {//////////////////
+        //while (lock->count == 0) {          //(lock->holder != NULL) {//////////////////
+        while (lock->holder != NULL) {
             wchan_lock(lock->wchan);
             spinlock_release(&lock->s_lock);
             wchan_sleep(lock->wchan);
             spinlock_acquire(&lock->s_lock);
         }
         lock->holder = curthread;
-        lock->count -= 1;                   //////////////////
+        //lock->count -= 1;                   //////////////////
         spinlock_release(&lock->s_lock);
         return;
 }
@@ -217,7 +218,7 @@ lock_release(struct lock *lock)
         KASSERT(lock_do_i_hold(lock));              // thread calling this should be thread holding lock
         spinlock_acquire(&lock->s_lock);
         lock->holder = NULL;                        // release lock
-        lock->count += 1;                           ///////////
+        //lock->count += 1;                           ///////////
 
         // wake wchan (if some other thread is waiting in while for lock_acquire):
         wchan_wakeone(lock->wchan);
@@ -288,14 +289,8 @@ cv_wait(struct cv *cv, struct lock *lock)
 {
         // Write this
         // must be called from within a critical section, even if after being woken up:
-    /*
-        KASSERT(lock_do_i_hold(lock) == true);
-        if (lock_do_i_hold(lock) == false) {
-            lock_acquire(lock);
-        }
-*/
-        KASSERT(lock != NULL); ////////////////
-        KASSERT(cv != NULL); /////////////////
+        KASSERT(lock != NULL);
+        KASSERT(cv != NULL);
 
         wchan_lock(cv->cv_wchan);
         lock_release(lock);
@@ -308,13 +303,11 @@ cv_signal(struct cv *cv, struct lock *lock)
 {
         // Write this
         // must be called from within a critical section:
-        /*KASSERT(lock_do_i_hold(lock) == true);*/
-        KASSERT(cv != NULL); /////////////
+        KASSERT(cv != NULL);
 
         if (lock_do_i_hold(lock)) {
-            wchan_wakeone(cv->cv_wchan); //////////////
+            wchan_wakeone(cv->cv_wchan);
         }
-        //wchan_wakeone(cv->cv_wchan);
 }
 
 void
@@ -325,6 +318,6 @@ cv_broadcast(struct cv *cv, struct lock *lock)
         KASSERT(cv != NULL);
 
         if (lock_do_i_hold(lock)) {
-            wchan_wakeall(cv->cv_wchan); //////////////
+            wchan_wakeall(cv->cv_wchan);
         }
 }
