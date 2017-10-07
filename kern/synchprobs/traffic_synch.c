@@ -12,13 +12,6 @@
  * before locks are implemented.
  */
 
-/* 
- * Replace this default synchronization mechanism with your own (better) mechanism
- * needed for your solution.   Your mechanism may use any of the available synchronzation
- * primitives, e.g., semaphores, locks, condition variables.   You are also free to 
- * declare other global variables if your solution requires them.
- */
-
 // CV:
 static struct cv *intersectionCV;
 
@@ -214,7 +207,6 @@ intersection_after_exit(Direction origin, Direction destination)
     Vehicle *v = array_get(vehicles, i);
     if ((v->origin = origin) && (v->destination = destination)) {
       array_remove(vehicles, i);
-      kprintf("broadcasting to CV\n");
       cv_broadcast(intersectionCV, mutex);
       // 1 vehicle gone from the picture, loop ends since v chucked out
       totalVehicles --;
