@@ -173,7 +173,7 @@ intersection_before_entry(Direction origin, Direction destination)
 
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
-  //KASSERT(vehicles != NULL);
+  KASSERT(vehicles != NULL);
 
   lock_acquire(mutex);
 
@@ -204,7 +204,7 @@ intersection_before_entry(Direction origin, Direction destination)
  */
 
 void
-intersection_after_exit(Direction origin, Direction destination) 
+intersection_after_exit(Direction origin, Direction destination)
 {
 
   kprintf("intersection_after_exit starting\n");
