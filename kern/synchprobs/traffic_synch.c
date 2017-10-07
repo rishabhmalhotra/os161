@@ -188,7 +188,8 @@ intersection_before_entry(Direction origin, Direction destination)
   // perVehicleConditionCheck checks conditions of this v with every other existing v:
   while (perVehicleConditionCheck(v) == false) {
     // do nothing, don't increment totalVehicles, just inside here
-    int abc = 1;
+    totalVehicles++;
+    totalVehicles--;
     kprintf("before_entry inside while pervehicleconditioncheck\n");
   }
 
