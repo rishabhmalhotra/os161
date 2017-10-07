@@ -199,7 +199,6 @@ lock_acquire(struct lock *lock)
 {
         KASSERT(!lock_do_i_hold(lock));     // don't already own lock
         spinlock_acquire(&lock->s_lock);
-        //while (lock->count == 0) {          //(lock->holder != NULL) {//////////////////
         while (lock->holder != NULL) {
             wchan_lock(lock->wchan);
             spinlock_release(&lock->s_lock);
@@ -207,7 +206,6 @@ lock_acquire(struct lock *lock)
             spinlock_acquire(&lock->s_lock);
         }
         lock->holder = curthread;
-        //lock->count -= 1;                   //////////////////
         spinlock_release(&lock->s_lock);
         return;
 }
@@ -218,7 +216,6 @@ lock_release(struct lock *lock)
         KASSERT(lock_do_i_hold(lock));              // thread calling this should be thread holding lock
         spinlock_acquire(&lock->s_lock);
         lock->holder = NULL;                        // release lock
-        //lock->count += 1;                           ///////////
 
         // wake wchan (if some other thread is waiting in while for lock_acquire):
         wchan_wakeone(lock->wchan);
