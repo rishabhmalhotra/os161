@@ -77,6 +77,7 @@ perVehicleConditionCheck(Vehicle *v) {
   KASSERT(lock_do_i_hold(mutex));
   array_add(vehicles, v, NULL);
   totalVehicles++;
+  
   return true;
 }
 
@@ -163,8 +164,7 @@ intersection_before_entry(Direction origin, Direction destination)
   // perVehicleConditionCheck checks conditions of this v with every other existing v:
   while (perVehicleConditionCheck(v) == false) {
     // do nothing:
-    totalVehicles++;
-    totalVehicles--;
+    totalVehicles += 0;
   }
 
   // added v to array for future per vehicle checks
