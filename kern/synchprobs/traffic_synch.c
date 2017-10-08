@@ -24,9 +24,9 @@ typedef struct Vehicle
   Direction destination;
 } Vehicle;
 
-bool checkConditions(Vehicle *v1, Vehicle *v2);       // true if any of the assignment conds. satisfied
+bool legalPairs(Vehicle *v1, Vehicle *v2);            // true if any of the assignment conds. satisfied
 
-bool isVehicleMakingRightTurn(Vehicle *v);            // helper for checkConditions, is v making a right turn
+bool isVehicleMakingRightTurn(Vehicle *v);            // helper for legalPairs, is v making a right turn
 
 bool perVehicleConditionCheck(Vehicle *v);            // for each vehicle, if conditionCheck is false, cv_wait
 
@@ -53,33 +53,25 @@ isVehicleMakingRightTurn(Vehicle *v) {
 }
 
 bool
-checkConditions(Vehicle *v1, Vehicle *v2) {
-  // if ((v1->origin == v2->origin) ||
-  //     ((v1->origin == v2->destination) && (v1->destination == v2->origin)) ||
-  //     ((v1->destination != v2->destination) && 
-  //       ((isVehicleMakingRightTurn(v1) == true) || (isVehicleMakingRightTurn(v2) == true)))) {
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  if (v1->origin == v2->origin) {
-    return true;
-  } else if ((v1->origin == v2->destination) && (v1->destination == v2->origin)) {
-    return true;
-  } else if ((v1->destination != v2->destination) && 
-              ((isVehicleMakingRightTurn(v1) == true) || (isVehicleMakingRightTurn(v2) == true))) {
-    return true;
-  } else {
-    return false;
-  }
+legalPairs(Vehicle *v1, Vehicle *v2) {
+  if ((v1->origin == v2->origin) ||
+      ((v1->origin == v2->destination) && (v1->destination == v2->origin)) ||
+      ((v1->destination != v2->destination) && 
+        ((isVehicleMakingRightTurn(v1) == true) || (isVehicleMakingRightTurn(v2) == true)))) {
+        return true;
+      } else {
+        return false;
+      }
 }
 
 bool
 perVehicleConditionCheck(Vehicle *v) {
-  for (unsigned int i=0; i<array_num(vehicles); i++) {
-    if (checkConditions(v, array_get(vehicles, i)) == false) {
-      cv_wait(intersectionCV, mutex);
-      return false;
+  if (array_num(vehicles) > 0) {
+    for (unsigned int i=0; i<array_num(vehicles); i++) {
+      if (legalPairs(v, array_get(vehicles, i)) == false) {
+        cv_wait(intersectionCV, mutex);
+        return false;
+      }
     }
   }
 
@@ -205,7 +197,7 @@ intersection_after_exit(Direction origin, Direction destination)
   // chuck out exiting vehicle from array to keep vehicles[] relevant:
   for (unsigned int i=0; i<array_num(vehicles); i++) {
     Vehicle *v = array_get(vehicles, i);
-    kprintf("v->origin:%d, v->destination:%d\n", v->origin, v->destination);
+    kprintf("v->origin:%c, v->destination:%c\n", v->origin, v->destination);
     if ((v->origin = origin) && (v->destination = destination)) {
       kprintf("inside the exiting if, will decrement totalVehicles now");
       array_remove(vehicles, i);
