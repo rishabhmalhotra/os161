@@ -69,7 +69,6 @@ perVehicleConditionCheck(Vehicle *v) {
   for (unsigned int i=0; i<array_num(vehicles); i++) {
     if (checkConditions(v, array_get(vehicles, i)) == false) {
       cv_wait(intersectionCV, mutex);
-      kprintf("returning false from perVehcheck\n");
       return false;
     }
   }
@@ -78,7 +77,6 @@ perVehicleConditionCheck(Vehicle *v) {
   KASSERT(lock_do_i_hold(mutex));
   array_add(vehicles, v, NULL);
   totalVehicles++;
-  kprintf("returning true from perVehcheck\n");
   return true;
 }
 
@@ -150,13 +148,9 @@ intersection_sync_cleanup(void)
 void
 intersection_before_entry(Direction origin, Direction destination) 
 {
-  kprintf("intersection_before_entry starting\n");
-
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
-
-  kprintf("before_entry KASSERTS complete\n");
 
   lock_acquire(mutex);
 
@@ -168,10 +162,9 @@ intersection_before_entry(Direction origin, Direction destination)
 
   // perVehicleConditionCheck checks conditions of this v with every other existing v:
   while (perVehicleConditionCheck(v) == false) {
-    // do nothing, don't increment totalVehicles, just inside here
+    // do nothing:
     totalVehicles++;
     totalVehicles--;
-    kprintf("before_entry inside while pervehicleconditioncheck\n");
   }
 
   // added v to array for future per vehicle checks
@@ -193,9 +186,6 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination)
 {
-
-  kprintf("intersection_after_exit starting\n");
-
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
