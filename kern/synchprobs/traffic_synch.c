@@ -77,7 +77,7 @@ perVehicleConditionCheck(Vehicle *v) {
   KASSERT(lock_do_i_hold(mutex));
   array_add(vehicles, v, NULL);
   totalVehicles++;
-  
+
   return true;
 }
 
@@ -194,13 +194,11 @@ intersection_after_exit(Direction origin, Direction destination)
 
   // chuck out exiting vehicle from array to keep vehicles[] relevant:
   for (unsigned int i=0; i<array_num(vehicles); i++) {
-    Vehicle *v = array_get(vehicles, i);
-    if ((v->origin = origin) && (v->destination = destination)) {
+    //Vehicle *v = array_get(vehicles, i);
+    if ((vehicles[i]->origin = origin) && (vehicles[i]->destination = destination)) {
       array_remove(vehicles, i);
       // 1 vehicle gone from the picture, loop ends since v chucked out
-      kprintf("totalVehicles before this exit:%d", totalVehicles);
       totalVehicles --;
-      kprintf("totalVehicles after this exit:%d", totalVehicles);
       cv_broadcast(intersectionCV, mutex);
       break;
     }
