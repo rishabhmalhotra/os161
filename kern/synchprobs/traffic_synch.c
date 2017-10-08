@@ -194,14 +194,16 @@ intersection_after_exit(Direction origin, Direction destination)
 
   // chuck out exiting vehicle from array to keep vehicles[] relevant:
   for (unsigned int i=0; i<array_num(vehicles); i++) {
-    //Vehicle *v = array_get(vehicles, i);
-    if ((vehicles[i]->origin = origin) && (vehicles[i]->destination = destination)) {
+    Vehicle *v = array_get(vehicles, i);
+    kprintf("v->origin:%d, v->destination:%d\n", v->origin, v->destination);
+    if ((v->origin = origin) && (v->destination = destination)) {
+      kprintf("inside the exiting if, will decrement totalVehicles now");
       array_remove(vehicles, i);
-      // 1 vehicle gone from the picture, loop ends since v chucked out
       totalVehicles --;
       cv_broadcast(intersectionCV, mutex);
       break;
     }
   }
+  kprintf("totalVehicles = %d\n", totalVehicles);
   lock_release(mutex);
 }
