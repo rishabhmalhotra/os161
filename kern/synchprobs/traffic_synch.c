@@ -197,9 +197,9 @@ intersection_after_exit(Direction origin, Direction destination)
     Vehicle *v = array_get(vehicles, i);
     if ((v->origin = origin) && (v->destination = destination)) {
       array_remove(vehicles, i);
-      cv_broadcast(intersectionCV, mutex);
       // 1 vehicle gone from the picture, loop ends since v chucked out
       totalVehicles --;
+      cv_broadcast(intersectionCV, mutex);
       break;
     }
   }
