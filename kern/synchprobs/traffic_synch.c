@@ -32,7 +32,7 @@ bool perVehicleConditionCheck(Vehicle *v);            // for each vehicle, if co
 
 
 // array of vehicles for perVehicleCheck():
-struct array *vehicles(void);
+struct array *vehicles;
 
 // Global var for CV (represents no of vehicles in array vehicles/no of vehicles on the roads):
 volatile int totalVehicles = 0;
