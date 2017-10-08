@@ -68,7 +68,7 @@ bool
 perVehicleConditionCheck(Vehicle *v) {
   if (array_num(vehicles) > 0) {
     for (unsigned int i=0; i<array_num(vehicles); i++) {
-      if (legalPairs(v, array_get(vehicles, i)) == false) {
+      if (legalPairs(v, array_get(vehicles, i)) == false) { // if or while
         cv_wait(intersectionCV, mutex);
         return false;
       }
@@ -202,10 +202,10 @@ intersection_after_exit(Direction origin, Direction destination)
       kprintf("inside the exiting if, will decrement totalVehicles now");
       array_remove(vehicles, i);
       totalVehicles --;
-      cv_broadcast(intersectionCV, mutex);
+      cv_signal(intersectionCV, mutex);
       break;
     }
   }
-  kprintf("totalVehicles = %d\n", totalVehicles);
+  kprintf("end of this exit\n");
   lock_release(mutex);
 }
