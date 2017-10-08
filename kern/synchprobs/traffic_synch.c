@@ -197,7 +197,7 @@ intersection_after_exit(Direction origin, Direction destination)
   // chuck out exiting vehicle from array to keep vehicles[] relevant:
   for (unsigned int i=0; i<array_num(vehicles); i++) {
     Vehicle *v = array_get(vehicles, i);
-    kprintf("v->origin:%c, v->destination:%c\n", v->origin, v->destination);
+    kprintf("v->origin:%d, v->destination:%d\n", v->origin, v->destination);
     if ((v->origin = origin) && (v->destination = destination)) {
       kprintf("inside the exiting if, will decrement totalVehicles now");
       array_remove(vehicles, i);
