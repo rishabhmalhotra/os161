@@ -58,6 +58,7 @@ legalPairs(Vehicle *v1, Vehicle *v2) {
       ((v1->origin == v2->destination) && (v1->destination == v2->origin)) ||
       ((v1->destination != v2->destination) && 
         ((isVehicleMakingRightTurn(v1) == true) || (isVehicleMakingRightTurn(v2) == true)))) {
+        kprintf("legalPairs with each of the existing %d vehicle(s)\n", array_num(vehicles));
         return true;
       } else {
         return false;
@@ -68,7 +69,8 @@ bool
 perVehicleConditionCheck(Vehicle *v) {
   if (array_num(vehicles) > 0) {
     for (unsigned int i=0; i<array_num(vehicles); i++) {
-      if (legalPairs(v, array_get(vehicles, i)) == false) { // if or while
+      if (legalPairs(v, vehicles[i]) == false) {                             //array_get(vehicles, i)
+        kprintf("not legal Pairs with o:%d, d:%d; so calling cv_wait\n", vehicles[i]->origin, vehicles[i]->destination);
         cv_wait(intersectionCV, mutex);
         return false;
       }
@@ -197,9 +199,8 @@ intersection_after_exit(Direction origin, Direction destination)
   // chuck out exiting vehicle from array to keep vehicles[] relevant:
   for (unsigned int i=0; i<array_num(vehicles); i++) {
     Vehicle *v = array_get(vehicles, i);
-    kprintf("v->origin:%d, v->destination:%d\n", v->origin, v->destination);
     if ((v->origin = origin) && (v->destination = destination)) {
-      kprintf("inside the exiting if, will decrement totalVehicles now");
+      kprintf("found matching v inside vehicles array, chucking it off\n");
       array_remove(vehicles, i);
       totalVehicles --;
       cv_signal(intersectionCV, mutex);
