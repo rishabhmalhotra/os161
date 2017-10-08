@@ -70,7 +70,7 @@ perVehicleConditionCheck(Vehicle *v) {
   if (array_num(vehicles) > 0) {
     for (unsigned int i=0; i<array_num(vehicles); i++) {
       if (legalPairs(v, array_get(vehicles, i)) == false) {
-        kprintf("not legal Pairs with o:%d, d:%d; so calling cv_wait\n", array_get(vehicles, i).origin, array_get(vehicles, i).destination);
+        kprintf("not legal Pairs with o:%d, d:%d; so calling cv_wait\n", array_get(vehicles, i)->origin, array_get(vehicles, i)->destination);
         cv_wait(intersectionCV, mutex);
         return false;
       }
