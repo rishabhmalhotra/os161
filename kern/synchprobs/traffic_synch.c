@@ -154,11 +154,12 @@ intersection_sync_cleanup(void)
 void
 intersection_before_entry(Direction origin, Direction destination) 
 {
+  lock_acquire(mutex);
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
 
-  lock_acquire(mutex);
+  // lock_acquire(mutex);
 
   // make vehicle
   Vehicle *v = kmalloc(sizeof(struct Vehicle));
@@ -191,11 +192,12 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination)
 {
+  lock_acquire(mutex);
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
 
-  lock_acquire(mutex);
+  //lock_acquire(mutex);
 
   // chuck out exiting vehicle from array to keep vehicles[] relevant:
   for (unsigned int i=0; i<array_num(vehicles); i++) {
