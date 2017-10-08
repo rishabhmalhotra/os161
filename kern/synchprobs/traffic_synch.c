@@ -198,7 +198,9 @@ intersection_after_exit(Direction origin, Direction destination)
     if ((v->origin = origin) && (v->destination = destination)) {
       array_remove(vehicles, i);
       // 1 vehicle gone from the picture, loop ends since v chucked out
+      kprintf("totalVehicles before this exit:%d", totalVehicles);
       totalVehicles --;
+      kprintf("totalVehicles after this exit:%d", totalVehicles);
       cv_broadcast(intersectionCV, mutex);
       break;
     }
