@@ -58,7 +58,7 @@ legalPairs(Vehicle *v1, Vehicle *v2) {
       ((v1->origin == v2->destination) && (v1->destination == v2->origin)) ||
       ((v1->destination != v2->destination) && 
         ((isVehicleMakingRightTurn(v1) == true) || (isVehicleMakingRightTurn(v2) == true)))) {
-        kprintf("legalPairs with existing %d vehicle(s)\n", array_num(vehicles));
+        kprintf("legalPairs with existing %d vehicle(s), returning true\n", array_num(vehicles));
         return true;
       } else {
         kprintf("not legal Pairs with o:%d, d:%d; so calling cv_wait\n", v2->origin, v2->destination);
@@ -71,7 +71,6 @@ perVehicleConditionCheck(Vehicle *v) {
   if (array_num(vehicles) > 0) {
     for (unsigned int i=0; i<array_num(vehicles); i++) {
       if (legalPairs(v, array_get(vehicles, i)) == false) {
-        // kprintf("not legal Pairs with o:%d, d:%d; so calling cv_wait\n", array_get(vehicles, i).origin, array_get(vehicles, i).destination);
         cv_wait(intersectionCV, mutex);
         return false;
       }
@@ -80,13 +79,8 @@ perVehicleConditionCheck(Vehicle *v) {
 
   // verify curthread is lock owner:
   KASSERT(lock_do_i_hold(mutex));
-  if (!lock_do_i_hold(mutex)) {
-    panic ("KASSERT failed, curthread doesn't hold lock\n");
-  }
   array_add(vehicles, v, NULL);
-  for (unsigned int i=0; i<array_num(vehicles); i++) {
-    kprintf("Vehicle %d\n", i);
-  }
+  kprintf("Now array has %d Vehicles, incrementing totalVehicles\n", array_num(vehicles));
   totalVehicles++;
   return true;
 }
