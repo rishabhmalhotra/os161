@@ -82,7 +82,7 @@ perVehicleConditionCheck(Vehicle *v) {
   KASSERT(lock_do_i_hold(mutex));
   panic ("KASSERT failed, curthread doesn't hold lock\n");
   array_add(vehicles, v, NULL);
-  for (unsigned int=0; i<array_num(vehicles); i++) {
+  for (unsigned int i=0; i<array_num(vehicles); i++) {
     kprintf("Vehicle %d\n", i);
   }
   totalVehicles++;
