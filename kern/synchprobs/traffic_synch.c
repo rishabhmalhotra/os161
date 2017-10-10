@@ -58,7 +58,7 @@ legalPairs(Vehicle *v1, Vehicle *v2) {
       ((v1->origin == v2->destination) && (v1->destination == v2->origin)) ||
       ((v1->destination != v2->destination) && 
         ((isVehicleMakingRightTurn(v1) == true) || (isVehicleMakingRightTurn(v2) == true)))) {
-        kprintf("legalPairs with each of the existing %d vehicle(s)\n", array_num(vehicles));
+        kprintf("legalPairs with existing %d vehicle(s)\n", array_num(vehicles));
         return true;
       } else {
         kprintf("not legal Pairs with o:%d, d:%d; so calling cv_wait\n", v2->origin, v2->destination);
@@ -206,7 +206,7 @@ intersection_after_exit(Direction origin, Direction destination)
       kprintf("found matching v inside vehicles array, chucking it off\n");
       array_remove(vehicles, i);
       totalVehicles --;
-      cv_signal(intersectionCV, mutex);
+      cv_broadcast(intersectionCV, mutex);
       break;
     }
   }
