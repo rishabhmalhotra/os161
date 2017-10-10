@@ -69,6 +69,9 @@ legalPairs(Vehicle *v1, Vehicle *v2) {
 bool
 perVehicleConditionCheck(Vehicle *v) {
   if (array_num(vehicles) > 0) {
+
+    lock_acquire(mutex);
+
     for (unsigned int i=0; i<array_num(vehicles); i++) {
       while (legalPairs(v, array_get(vehicles, i)) == false) {
         kprintf("Will crash, not legal pair with something so going to cv wait\n");
@@ -83,6 +86,7 @@ perVehicleConditionCheck(Vehicle *v) {
   array_add(vehicles, v, NULL);
   kprintf("Now array has %d Vehicles, incrementing totalVehicles\n", array_num(vehicles));
   totalVehicles++;
+  lock_release(mutex);
   return true;
 }
 
@@ -154,12 +158,11 @@ intersection_sync_cleanup(void)
 void
 intersection_before_entry(Direction origin, Direction destination) 
 {
-  // lock_acquire(mutex);
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
 
-  lock_acquire(mutex);
+  // lock_acquire(mutex);
 
   // make vehicle
   Vehicle *v = kmalloc(sizeof(struct Vehicle));
@@ -174,7 +177,7 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
   // added v to array for future per vehicle checks
-  lock_release(mutex);
+  // lock_release(mutex);
 }
 
 
@@ -192,24 +195,22 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination)
 {
-  // lock_acquire(mutex);
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
-
-  lock_acquire(mutex);
 
   // chuck out exiting vehicle from array to keep vehicles[] relevant:
   for (unsigned int i=0; i<array_num(vehicles); i++) {
     Vehicle *v = array_get(vehicles, i);
     if ((v->origin = origin) && (v->destination = destination)) {
       kprintf("found matching v inside intersection, chucking it off\n");
+      lock_acquire(mutex);
       array_remove(vehicles, i);
       totalVehicles --;
       cv_broadcast(intersectionCV, mutex);
+      lock_release(mutex);
       break;
     }
   }
   kprintf("end of this exit\n");
-  lock_release(mutex);
 }
