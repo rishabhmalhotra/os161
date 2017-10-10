@@ -61,7 +61,7 @@ legalPairs(Vehicle *v1, Vehicle *v2) {
         kprintf("legalPairs with existing %d vehicle(s), returning true\n", array_num(vehicles));
         return true;
       } else {
-        kprintf("not legal Pairs with o:%d, d:%d; so calling cv_wait\n", v2->origin, v2->destination);
+        kprintf("not legal Pairs with o:%d, d:%d\n", v2->origin, v2->destination);
         return false;
       }
 }
@@ -70,7 +70,7 @@ bool
 perVehicleConditionCheck(Vehicle *v) {
   if (array_num(vehicles) > 0) {
     for (unsigned int i=0; i<array_num(vehicles); i++) {
-      if (legalPairs(v, array_get(vehicles, i)) == false) {
+      while (legalPairs(v, array_get(vehicles, i)) == false) {
         kprintf("Will crash, not legal pair with something so going to cv wait\n");
         cv_wait(intersectionCV, mutex);
         return false;
@@ -154,12 +154,12 @@ intersection_sync_cleanup(void)
 void
 intersection_before_entry(Direction origin, Direction destination) 
 {
-  lock_acquire(mutex);
+  // lock_acquire(mutex);
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
 
-  // lock_acquire(mutex);
+  lock_acquire(mutex);
 
   // make vehicle
   Vehicle *v = kmalloc(sizeof(struct Vehicle));
@@ -192,12 +192,12 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination)
 {
-  lock_acquire(mutex);
+  // lock_acquire(mutex);
   KASSERT(vehicles != NULL);
   KASSERT(intersectionCV != NULL);
   KASSERT(mutex != NULL);
 
-  //lock_acquire(mutex);
+  lock_acquire(mutex);
 
   // chuck out exiting vehicle from array to keep vehicles[] relevant:
   for (unsigned int i=0; i<array_num(vehicles); i++) {
