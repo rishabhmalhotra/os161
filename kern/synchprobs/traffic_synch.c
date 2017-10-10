@@ -68,10 +68,8 @@ legalPairs(Vehicle *v1, Vehicle *v2) {
 
 bool
 perVehicleConditionCheck(Vehicle *v) {
+  lock_acquire(mutex);
   if (array_num(vehicles) > 0) {
-
-    lock_acquire(mutex);
-
     for (unsigned int i=0; i<array_num(vehicles); i++) {
       while (legalPairs(v, array_get(vehicles, i)) == false) {
         kprintf("Will crash, not legal pair with something so going to cv wait\n");
