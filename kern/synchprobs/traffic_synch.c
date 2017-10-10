@@ -71,6 +71,7 @@ perVehicleConditionCheck(Vehicle *v) {
   if (array_num(vehicles) > 0) {
     for (unsigned int i=0; i<array_num(vehicles); i++) {
       if (legalPairs(v, array_get(vehicles, i)) == false) {
+        kprintf("Will crash, not legal pair with something so going to cv wait\n");
         cv_wait(intersectionCV, mutex);
         return false;
       }
@@ -202,7 +203,7 @@ intersection_after_exit(Direction origin, Direction destination)
   for (unsigned int i=0; i<array_num(vehicles); i++) {
     Vehicle *v = array_get(vehicles, i);
     if ((v->origin = origin) && (v->destination = destination)) {
-      kprintf("found matching v inside vehicles array, chucking it off\n");
+      kprintf("found matching v inside intersection, chucking it off\n");
       array_remove(vehicles, i);
       totalVehicles --;
       cv_broadcast(intersectionCV, mutex);
