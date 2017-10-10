@@ -151,7 +151,7 @@ intersection_sync_cleanup(void)
 
   lock_destroy(mutex);
   cv_destroy(intersectionCV);
-  array_destroy(vehicles);
+  // array_destroy(vehicles);
 }
 
 /*
