@@ -288,6 +288,7 @@ cv_wait(struct cv *cv, struct lock *lock)
         // must be called from within a critical section, even if after being woken up:
         KASSERT(lock != NULL);
         KASSERT(cv != NULL);
+        KASSERT(lock_do_i_hold(lock));
 
         wchan_lock(cv->cv_wchan);
         lock_release(lock);
@@ -301,6 +302,7 @@ cv_signal(struct cv *cv, struct lock *lock)
         // Write this
         // must be called from within a critical section:
         KASSERT(cv != NULL);
+        KASSERT(lock_do_i_hold(lock));
 
         if (lock_do_i_hold(lock)) {
             wchan_wakeone(cv->cv_wchan);
@@ -313,6 +315,7 @@ cv_broadcast(struct cv *cv, struct lock *lock)
 	   // Write this
        // must be called from within a critical section:
         KASSERT(cv != NULL);
+        KASSERT(lock_do_i_hold(lock));
 
         if (lock_do_i_hold(lock)) {
             wchan_wakeall(cv->cv_wchan);
