@@ -170,14 +170,14 @@ intersection_before_entry(Direction origin, Direction destination)
           cv_wait(intersectionCV, mutex);
         }
         WS++;
-      }
     } else {                                                                                  // straight line (WE)
         while ((ES != 0) && (SW != 0) && (SN != 0) && (NS != 0) && (NE != 0) && (SE != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         WE++;
     }
-    
+  }
+
     lock_release(mutex);
   }
 
