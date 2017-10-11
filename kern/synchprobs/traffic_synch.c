@@ -154,7 +154,7 @@ intersection_before_entry(Direction origin, Direction destination)
         }
         ES++;
     } else {                                                                                  // straight line (EW)
-        while ((SE != 0) || (SN != 0) || (SW != 0) || (NS != 0) || (NE != 0) || (EN != 0)) {
+        while ((NW != 0) || (SN != 0) || (SW != 0) || (NS != 0) || (NE != 0) || (WN != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         EW++;
