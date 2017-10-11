@@ -110,68 +110,68 @@ intersection_before_entry(Direction origin, Direction destination)
 
   if (v->origin == north) {
     if (v->destination == south) {                                                           // straight line (NS) 
-        while ((SW != 0) && (EW != 0) && (ES != 0) && (WE != 0) && (WS != 0) && (WN != 0)) {
+        while ((SW != 0) || (EW != 0) || (ES != 0) || (WE != 0) || (WS != 0) || (WN != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         NS++;
     } else if (v->destination == east) {                                                     // left turn (NE)
-        while ((WN != 0) && (WE != 0) && (SN != 0) && (SW != 0) && (ES != 0) && (EW != 0)) {
+        while ((WN != 0) || (WE != 0) || (SN != 0) || (SW != 0) || (ES != 0) || (EW != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         NE++;
     } else {                                                                                 // right turn (NW)
-        while ((SW != 0) && (EW != 0)) {
+        while ((SW != 0) || (EW != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         NW++;
     }
   } else if (v->origin == south) {
     if (v->destination == north) {                                                           // straight line (SN)
-        while ((EW != 0) && (ES != 0) && (EN != 0) && (WE != 0) && (WN != 0) && (NE != 0)) {
+        while ((EW != 0) || (ES != 0) || (EN != 0) || (WE != 0) || (WN != 0) || (NE != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         SN++;
     } else if (v->destination == east) {                                                     // right turn (SE)
-        while ((WE != 0) && (NE != 0)) {
+        while ((WE != 0) || (NE != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         SE++;
     } else {                                                                                 // dest = west, left turn (SW)
-        while ((EW != 0) && (WE != 0) && (ES != 0) && (NS != 0) && (NE != 0) && (WN != 0)) {
+        while ((EW != 0) || (WE != 0) || (ES != 0) || (NS != 0) || (NE != 0) || (WN != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         SW++;
     }
   } else if (v->origin == east) {
     if (v->destination == north) {                                                           // right turn (EN)
-        while ((SN != 0) && (WN != 0)) {
+        while ((SN != 0) || (WN != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         EN++;
     } else if (v->destination == south) {                                                    // left turn (ES)
-        while ((WS != 0) && (WE != 0) && (WN != 0) && (SN != 0) && (NS != 0) && (NE != 0)) {
+        while ((WS != 0) || (WE != 0) || (WN != 0) || (SN != 0) || (NS != 0) || (NE != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         ES++;
     } else {                                                                                  // straight line (EW)
-        while ((SE != 0) && (SN != 0) && (SW != 0) && (NS != 0) && (NE != 0) && (EN != 0)) {
+        while ((SE != 0) || (SN != 0) || (SW != 0) || (NS != 0) || (NE != 0) || (EN != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         EW++;
     }
   } else {                                                                                    // Origin is West
     if (v->destination == north) {                                                            // left turn (WN)
-        while ((SN != 0) && (SW != 0) && (EW != 0) && (ES != 0) && (NS != 0) && (NE != 0)) {
+        while ((SN != 0) || (SW != 0) || (EW != 0) || (ES != 0) || (NS != 0) || (NE != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         WN++;
     } else if (v->destination == south) {                                                     // right turn (WS)
-        while ((NS != 0) && (ES != 0)) {
+        while ((NS != 0) || (ES != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         WS++;
     } else {                                                                                  // straight line (WE)
-        while ((ES != 0) && (SW != 0) && (SN != 0) && (NS != 0) && (NE != 0) && (SE != 0)) {
+        while ((ES != 0) || (SW != 0) || (SN != 0) || (NS != 0) || (NE != 0) || (SE != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         WE++;
