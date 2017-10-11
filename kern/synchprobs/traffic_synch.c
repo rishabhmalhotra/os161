@@ -37,6 +37,7 @@ typedef struct Vehicle
   Direction destination;
 } Vehicle;
 
+
                             // Corresponding CVs:
 volatile int NS = 0;        //    cv1                                    
 volatile int NE = 0;        //    cv2
@@ -50,6 +51,9 @@ volatile int EW = 0;        //    cv9
 volatile int WN = 0;        //    cv10
 volatile int WS = 0;        //    cv11
 volatile int WE = 0;        //    cv12
+
+// forward declaration
+void checkForCvAndBroadcast(void);
 
 
 // macros for cv true conditions:
