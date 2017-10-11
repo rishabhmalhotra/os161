@@ -195,15 +195,12 @@ intersection_before_entry(Direction origin, Direction destination)
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else if (v->destination == west) {                                                     // right turn (NW)
+    } else {                                                                                // right turn (NW)
       if ((SW == 0) && (EW == 0)) {
         NW++;
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else {
-      // this is never hit
-      WE += 0;
     }
   } else if (v->origin == south) {
     if (v->destination == north) {                                                            // straight line (SN)
@@ -218,38 +215,32 @@ intersection_before_entry(Direction origin, Direction destination)
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else if (v->destination == west) {
-      if ((EW == 0) && (WE == 0) && (ES == 0) && (NS == 0) && (NE == 0) && (WN == 0)) {   // left turn (SW)
+    } else {                                                                                 // dest = west
+      if ((EW == 0) && (WE == 0) && (ES == 0) && (NS == 0) && (NE == 0) && (WN == 0)) {      // left turn (SW)
         SW++;
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else {
-      // this is never hit
-      WE += 0;
     }
   } else if (v->origin == east) {
-    if (v->destination == north) {                                                            // right turn (EN)
+    if (v->destination == north) {                                                           // right turn (EN)
       if ((SN == 0) && (WN == 0)) {
         EN++;
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else if (v->destination == south) {                                                     // left turn (ES)
+    } else if (v->destination == south) {                                                    // left turn (ES)
       if ((WS == 0) && (WE == 0) && (WN == 0) && (SN == 0) && (NS == 0) && (NE == 0)) {
         ES++;
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else if (v->destination == west) {                                                     // straight line (EW)
+    } else {                                                     // straight line (EW)
       if ((SE == 0) && (SN == 0) && (SW == 0) && (NS == 0) && (NE == 0) && (EN == 0)) {
         EW++;
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else {
-      // this is never hit
-      WE += 0;
     }
   } else {                                                                                // Origin is West
     if (v->destination == north) {                                                            // left turn (WN)
@@ -264,15 +255,12 @@ intersection_before_entry(Direction origin, Direction destination)
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else if (v->destination == east) {                                                     // straight line (WE)
+    } else {                                                     // straight line (WE)
       if ((ES == 0) && (SW == 0) && (SN == 0) && (NS == 0) && (NE == 0) && (SE == 0)) {
         WE++;
       } else {
         cv_wait(intersectionCV, mutex);
       }
-    } else {
-      // this is never hit
-      WE += 0;
     }
   }
 
@@ -319,12 +307,9 @@ intersection_after_exit(Direction origin, Direction destination)
     } else if (v->destination == east) {
       NE--;
       cv_broadcast(intersectionCV, mutex);
-    } else if (v->destination == west) {
+    } else {                                                                            // dest = west
       NW--;
       cv_broadcast(intersectionCV, mutex);
-    } else {
-      // this is never hit
-      WE += 0;
     }
   } else if (v->origin == south) {
     if (v->destination == north) {
@@ -333,12 +318,9 @@ intersection_after_exit(Direction origin, Direction destination)
     } else if (v->destination == east) {
       SE--;
       cv_broadcast(intersectionCV, mutex);
-    } else if (v->destination == west) {
+    } else {                                                                            // dest = west
       SW--;
       cv_broadcast(intersectionCV, mutex);
-    } else {
-      // this is never hit
-      WE += 0;
     }
   } else if (v->origin == east) {
     if (v->destination == north) {
@@ -347,12 +329,9 @@ intersection_after_exit(Direction origin, Direction destination)
     } else if (v->destination == south) {
       ES--;
       cv_broadcast(intersectionCV, mutex);
-    } else if (v->destination == west) {
+    } else {                                                                              // dest = west
       EW--;
       cv_broadcast(intersectionCV, mutex);
-    } else {
-      // this is never hit
-      WE += 0;
     }
   } else {                                                                                // Origin is West
     if (v->destination == north) {
@@ -361,12 +340,9 @@ intersection_after_exit(Direction origin, Direction destination)
     } else if (v->destination == south) {
       WS--;
       cv_broadcast(intersectionCV, mutex);
-    } else if (v->destination == east) {
+    } else {                                                                              // dest = east
       WE--;
       cv_broadcast(intersectionCV, mutex);
-    } else {
-      // this is never hit
-      WE += 0;
     }
   }
 
