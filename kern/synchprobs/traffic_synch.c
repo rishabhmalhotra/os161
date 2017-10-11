@@ -115,7 +115,7 @@ intersection_before_entry(Direction origin, Direction destination)
         }
         NS++;
     } else if (v->destination == east) {                                                     // left turn (NE)
-        while ((WN != 0) || (WE != 0) || (SN != 0) || (SW != 0) || (ES != 0) || (EW != 0)) {
+        while ((WN != 0) || (WE != 0) || (SN != 0) || (SW != 0) || (ES != 0) || (EW != 0) || (SE != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         NE++;
@@ -137,7 +137,7 @@ intersection_before_entry(Direction origin, Direction destination)
         }
         SE++;
     } else {                                                                                 // dest = west, left turn (SW)
-        while ((EW != 0) || (WE != 0) || (ES != 0) || (NS != 0) || (NE != 0) || (WN != 0)) {
+        while ((EW != 0) || (WE != 0) || (ES != 0) || (NS != 0) || (NE != 0) || (WN != 0) || (NW != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         SW++;
@@ -149,7 +149,7 @@ intersection_before_entry(Direction origin, Direction destination)
         }
         EN++;
     } else if (v->destination == south) {                                                    // left turn (ES)
-        while ((WS != 0) || (WE != 0) || (WN != 0) || (SN != 0) || (NS != 0) || (NE != 0)) {
+        while ((WS != 0) || (WE != 0) || (WN != 0) || (SN != 0) || (NS != 0) || (NE != 0) || (SW != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         ES++;
@@ -161,7 +161,7 @@ intersection_before_entry(Direction origin, Direction destination)
     }
   } else {                                                                                    // Origin is West
     if (v->destination == north) {                                                            // left turn (WN)
-        while ((SN != 0) || (SW != 0) || (EW != 0) || (ES != 0) || (NS != 0) || (NE != 0)) {
+        while ((SN != 0) || (SW != 0) || (EW != 0) || (ES != 0) || (EN != 0) || (NS != 0) || (NE != 0)) {
           cv_wait(intersectionCV, mutex);
         }
         WN++;
