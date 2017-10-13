@@ -509,7 +509,7 @@ checkForCvAndBroadcast(void) {
   //     panic("should have never reached here!! deadlock!!!");
   //   }
   // }
-}
+//}
 
 /*
  * The simulation driver will call this function each time a vehicle
