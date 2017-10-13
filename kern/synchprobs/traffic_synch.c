@@ -30,10 +30,10 @@ static struct cv *cv12;
 static struct lock *mutex;
 
 // priority queue for longest waiting cv:
-volatile struct array *pqueue;
+struct array *pqueue;
 
 // array with pointers to vehicles that are currently inside the intersection:
-volatile struct array* vehicles;
+struct array* vehicles;
 
 typedef struct Vehicle
 {
@@ -456,19 +456,24 @@ if (array_num(pqueue) > 0) {
       // do nothing
     }
   }
-  return;
+
   // if no other vehicles, broadcast to first
-  // if (array_num(vehicles) == 0) {
-  //   if (array_num(pqueue) > 0) {
-  //     cv_broadcast(array_get(pqueue, 0), mutex);
-  //   }
-  // }
+  if (array_num(vehicles) == 0) {
+    if (array_num(pqueue) > 0) {
+      cv_broadcast(array_get(pqueue, 0), mutex);
+    }
+  }
+
+  return;
 }
 
 // remove CV* c from priority queue
 void
 removeFromPqueue(struct cv* c) {
   if (array_num(vehicles) > 0) {
+    if ((i == array_num(pqueue) - 1) && (array_get(pqueue, i) != c)) {
+      panic ("Couldn't find cv to remove from pqueue\n");
+    }
     for (unsigned int i=0; i<array_num(pqueue); i++) {
       if (array_get(pqueue, i) == c) {
         array_remove(pqueue, i);
@@ -482,9 +487,9 @@ removeFromPqueue(struct cv* c) {
 void
 removeVehicle(Vehicle *v) {
   for (unsigned int i=0; i<array_num(vehicles); i++) {
-    // if ((i == array_num(vehicles) - 1) && (v != array_get(vehicles, i))) {
-    //   panic ("Vehicle v not found in array for removing\n");
-    // }
+    if ((i == array_num(vehicles) - 1) && (v != array_get(vehicles, i))) {
+      panic ("Vehicle v not found in array for removing\n");
+    }
     if (v == array_get(vehicles, i)) {
       array_remove(vehicles, i);
       break;
@@ -533,61 +538,39 @@ intersection_after_exit(Direction origin, Direction destination)
   if (v->origin == north) {
     if (v->destination == south) {
       NS--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
-      
     } else if (v->destination == east) {
       NE--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       NW--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     }
   } else if (v->origin == south) {
     if (v->destination == north) {
       SN--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     } else if (v->destination == east) {
       SE--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       SW--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     }
   } else if (v->origin == east) {
     if (v->destination == north) {
       EN--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     } else if (v->destination == south) {
       ES--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       EW--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     }
   } else {                                                                              // Origin is West
     if (v->destination == north) {
       WN--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     } else if (v->destination == south) {
       WS--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     } else {                                                                            // dest = east
       WE--;
-      removeVehicle(v);
-      checkForCvAndBroadcast();
     }
   }
+
+  removeVehicle(v);
+  checkForCvAndBroadcast();
 
   lock_release(mutex);
 }
