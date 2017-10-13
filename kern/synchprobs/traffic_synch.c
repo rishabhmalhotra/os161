@@ -354,7 +354,7 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 checkForCvAndBroadcast(void) {
 
-if (array_num > 0) {
+if (array_num(pqueue) > 0) {
   if (array_get(pqueue, 0) == cv1) {
       if cv1trueconditions {
         array_remove(pqueue, 0);
