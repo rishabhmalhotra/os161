@@ -30,6 +30,7 @@ static struct cv *cv12;
 static struct lock *mutex;
 
 struct array *pqueue;
+Vehicle* array vehicles;
 
 typedef struct Vehicle
 {
@@ -55,6 +56,7 @@ volatile int WE = 0;        //    cv12
 // forward declaration
 void checkForCvAndBroadcast(void);
 void removeFromPqueue(struct cv* c);
+void removeVehicle(Vehicle* v);
 
 
 // macros for cv true conditions:
@@ -150,6 +152,9 @@ intersection_sync_init(void)
   pqueue = array_create();
   array_init(pqueue);
 
+  vehicles = array_create();
+  array_init(vehicles);
+
   // create lock for above CV:
   mutex = lock_create("mutex");
   if (mutex == NULL) {
@@ -186,6 +191,7 @@ intersection_sync_cleanup(void)
   lock_destroy(mutex);
 
   array_destroy(pqueue);
+  array_destroy(vehicles);
 
   cv_destroy(cv1);
   cv_destroy(cv2);
@@ -249,6 +255,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv1falseconditions {
           cv_wait(cv1, mutex);
         }
+        array_add(vehicles, v, NULL);
         NS++;
     } else if (v->destination == east) {                                                     // left turn (NE)
         if cv2falseconditions {
@@ -257,6 +264,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv2falseconditions {
           cv_wait(cv2, mutex);
         }
+        array_add(vehicles, v, NULL);
         NE++;
     } else {                                                                                 // right turn (NW)
         if cv3falseconditions {
@@ -265,6 +273,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv3falseconditions {
           cv_wait(cv3, mutex);
         }
+        array_add(vehicles, v, NULL);
         NW++;
     }
   } else if (v->origin == south) {
@@ -275,6 +284,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv4falseconditions {
           cv_wait(cv4, mutex);
         }
+        array_add(vehicles, v, NULL);
         SN++;
     } else if (v->destination == east) {                                                     // right turn (SE)
         if cv5falseconditions {
@@ -283,6 +293,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv5falseconditions {
           cv_wait(cv5, mutex);
         }
+        array_add(vehicles, v, NULL);
         SE++;
     } else {                                                                                 // dest = west, left turn (SW)
         if cv6falseconditions {
@@ -291,6 +302,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv6falseconditions {
           cv_wait(cv6, mutex);
         }
+        array_add(vehicles, v, NULL);
         SW++;
     }
   } else if (v->origin == east) {
@@ -301,6 +313,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv7falseconditions {
           cv_wait(cv7, mutex);
         }
+        array_add(vehicles, v, NULL);
         EN++;
     } else if (v->destination == south) {                                                    // left turn (ES)
         if cv8falseconditions {
@@ -309,6 +322,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv8falseconditions {
           cv_wait(cv8, mutex);
         }
+        array_add(vehicles, v, NULL);
         ES++;
     } else {                                                                                  // straight line (EW)
         if cv9falseconditions {
@@ -317,6 +331,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv9falseconditions {
           cv_wait(cv9, mutex);
         }
+        array_add(vehicles, v, NULL);
         EW++;
     }
   } else {                                                                                    // Origin is West
@@ -327,6 +342,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv10falseconditions {
           cv_wait(cv10, mutex);
         }
+        array_add(vehicles, v, NULL);
         WN++;
     } else if (v->destination == south) {                                                     // right turn (WS)
         if cv11falseconditions {
@@ -335,6 +351,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv11falseconditions {
           cv_wait(cv11, mutex);
         }
+        array_add(vehicles, v, NULL);
         WS++;
     } else {                                                                                  // straight line (WE)
         if cv12falseconditions {
@@ -343,6 +360,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv12falseconditions {
           cv_wait(cv12, mutex);
         }
+        array_add(vehicles, v, NULL);
         WE++;
     }
   }
@@ -361,61 +379,73 @@ KASSERT (lock_do_i_hold(mutex));
 if (array_num(pqueue) > 0) {
   if (array_get(pqueue, 0) == cv1) {
       if cv1trueconditions {
+        removeFromPqueue(cv1);
         cv_broadcast(cv1, mutex);
         // return;
       }
     } else if (array_get(pqueue, 0) == cv2) {
       if cv2trueconditions {
+        removeFromPqueue(cv2);
         cv_broadcast(cv2, mutex);
         // return;
       }
     } else if (array_get(pqueue, 0) == cv3) {
       if cv3trueconditions {
+        removeFromPqueue(cv3);
         cv_broadcast(cv3, mutex);
         // return;
       } 
     } else if (array_get(pqueue, 0) == cv4) {
       if cv4trueconditions {
+        removeFromPqueue(cv4);
         cv_broadcast(cv4, mutex);
         // return;
       }
     } else if (array_get(pqueue, 0) == cv5) {
       if cv5trueconditions {
+        removeFromPqueue(cv5);
         cv_broadcast(cv5, mutex);
         // return;
       } 
     } else if (array_get(pqueue, 0) == cv6) {
       if cv6trueconditions {
+        removeFromPqueue(cv6);
         cv_broadcast(cv6, mutex);
         // return;
       } 
     } else if (array_get(pqueue, 0) == cv7) {
       if cv7trueconditions {
+        removeFromPqueue(cv7);
         cv_broadcast(cv7, mutex);
         // return;
       } 
     } else if (array_get(pqueue, 0) == cv8) {
       if cv8trueconditions {
+        removeFromPqueue(cv8);
         cv_broadcast(cv8, mutex);
         // return;
       }
     } else if (array_get(pqueue, 0) == cv9) {
       if cv9trueconditions {
+        removeFromPqueue(cv9);
         cv_broadcast(cv9, mutex);
         // return;
       }
     } else if (array_get(pqueue, 0) == cv10) {
       if cv10trueconditions {
+        removeFromPqueue(cv10);
         cv_broadcast(cv10, mutex);
         // return;
       }
     } else if (array_get(pqueue, 0) == cv11) {
       if cv11trueconditions {
+        removeFromPqueue(cv11);
         cv_broadcast(cv11, mutex);
         // return;
       }
     } else if (array_get(pqueue, 0) == cv12) {
       if cv1trueconditions {
+        removeFromPqueue(cv12);
         cv_broadcast(cv12, mutex);
         // return;
       }
@@ -424,9 +454,12 @@ if (array_num(pqueue) > 0) {
       // return;
     }
   }
-  // return;
+  //return;
+  // if no other vehicles, broadcast to first
   if (array_num(vehicles) == 0) {
-    cv_broadcast(array_get(pqueue, 0), mutex);
+    if (array_num(pqueue) > 0) {
+      cv_broadcast(array_get(pqueue, 0), mutex);
+    }
   }
 }
 
@@ -435,6 +468,16 @@ removeFromPqueue(struct cv* c) {
   for (unsigned int i=0; i<array_num(pqueue); i++) {
     if (array_get(pqueue, i) == c) {
       array_remove(pqueue, i);
+    }
+  }
+}
+
+void
+removeVehicle(Vehicle *v) {
+  for (unsigned int i=0; i<array_num(vehicles); i++) {
+    if (v == array_get(vehicles, i)) {
+      array_remove(vehicles, i);
+      break;
     }
   }
 }
@@ -479,58 +522,58 @@ intersection_after_exit(Direction origin, Direction destination)
   if (v->origin == north) {
     if (v->destination == south) {
       NS--;
-      removeFromPqueue(cv1);
+      removeVehicle(v);
       checkForCvAndBroadcast();
       
     } else if (v->destination == east) {
       NE--;
-      removeFromPqueue(cv2);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       NW--;
-      removeFromPqueue(cv3);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     }
   } else if (v->origin == south) {
     if (v->destination == north) {
       SN--;
-      removeFromPqueue(cv4);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     } else if (v->destination == east) {
       SE--;
-      removeFromPqueue(cv5);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       SW--;
-      removeFromPqueue(cv6);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     }
   } else if (v->origin == east) {
     if (v->destination == north) {
       EN--;
-      removeFromPqueue(cv7);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     } else if (v->destination == south) {
       ES--;
-      removeFromPqueue(cv8);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       EW--;
-      removeFromPqueue(cv9);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     }
   } else {                                                                              // Origin is West
     if (v->destination == north) {
       WN--;
-      removeFromPqueue(cv10);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     } else if (v->destination == south) {
       WS--;
-      removeFromPqueue(cv11);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = east
       WE--;
-      removeFromPqueue(cv12);
+      removeVehicle(v);
       checkForCvAndBroadcast();
     }
   }
