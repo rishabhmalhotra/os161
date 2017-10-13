@@ -375,8 +375,9 @@ void
 checkForCvAndBroadcast(void) {
 
 KASSERT (lock_do_i_hold(mutex));
-int count = array_num(pqueue);
-KASSERT (if (array_num(vehicles) == 0) { count == 0; })
+if ((array_num(vehicles) == 0) && (array_num(pqueue) != 0) {
+  panic ("not zero\n");
+}
 
 if (array_num(pqueue) > 0) {
   if (array_get(pqueue, 0) == cv1) {
