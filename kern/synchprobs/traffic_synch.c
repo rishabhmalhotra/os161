@@ -369,7 +369,9 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv12falseconditions {
           cv_wait(cv12, mutex);
         }
-        array_add(vehicles, v, NULL);
+        if (array_add(vehicles, v, NULL) == 0) {
+          panic ("couldn't add to array\n");
+        }
         WE++;
     }
   }
