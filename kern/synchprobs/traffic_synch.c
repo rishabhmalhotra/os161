@@ -191,7 +191,7 @@ intersection_sync_cleanup(void)
   lock_destroy(mutex);
 
   array_destroy(pqueue);
-  array_destroy(vehicles);
+  //array_destroy(vehicles);
 
   cv_destroy(cv1);
   cv_destroy(cv2);
