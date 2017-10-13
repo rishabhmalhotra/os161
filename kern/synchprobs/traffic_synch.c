@@ -378,6 +378,7 @@ void
 checkForCvAndBroadcast(void) {
 
 KASSERT (lock_do_i_hold(mutex));
+// if the number of vehicles in intersection is 0, number of cv's in pqueue should be 0 too
 if ((array_num(vehicles) == 0) && (array_num(pqueue) != 0)) {
   panic ("not zero\n");
 }
@@ -387,80 +388,67 @@ if (array_num(pqueue) > 0) {
       if cv1trueconditions {
         removeFromPqueue(cv1);
         cv_broadcast(cv1, mutex);
-        // return;
       }
     } else if (array_get(pqueue, 0) == cv2) {
       if cv2trueconditions {
         removeFromPqueue(cv2);
         cv_broadcast(cv2, mutex);
-        // return;
       }
     } else if (array_get(pqueue, 0) == cv3) {
       if cv3trueconditions {
         removeFromPqueue(cv3);
         cv_broadcast(cv3, mutex);
-        // return;
       } 
     } else if (array_get(pqueue, 0) == cv4) {
       if cv4trueconditions {
         removeFromPqueue(cv4);
         cv_broadcast(cv4, mutex);
-        // return;
       }
     } else if (array_get(pqueue, 0) == cv5) {
       if cv5trueconditions {
         removeFromPqueue(cv5);
         cv_broadcast(cv5, mutex);
-        // return;
       } 
     } else if (array_get(pqueue, 0) == cv6) {
       if cv6trueconditions {
         removeFromPqueue(cv6);
         cv_broadcast(cv6, mutex);
-        // return;
       } 
     } else if (array_get(pqueue, 0) == cv7) {
       if cv7trueconditions {
         removeFromPqueue(cv7);
         cv_broadcast(cv7, mutex);
-        // return;
       } 
     } else if (array_get(pqueue, 0) == cv8) {
       if cv8trueconditions {
         removeFromPqueue(cv8);
         cv_broadcast(cv8, mutex);
-        // return;
       }
     } else if (array_get(pqueue, 0) == cv9) {
       if cv9trueconditions {
         removeFromPqueue(cv9);
         cv_broadcast(cv9, mutex);
-        // return;
       }
     } else if (array_get(pqueue, 0) == cv10) {
       if cv10trueconditions {
         removeFromPqueue(cv10);
         cv_broadcast(cv10, mutex);
-        // return;
       }
     } else if (array_get(pqueue, 0) == cv11) {
       if cv11trueconditions {
         removeFromPqueue(cv11);
         cv_broadcast(cv11, mutex);
-        // return;
       }
     } else if (array_get(pqueue, 0) == cv12) {
       if cv1trueconditions {
         removeFromPqueue(cv12);
         cv_broadcast(cv12, mutex);
-        // return;
       }
     } else {
       // do nothing
-      // return;
     }
   }
-  //return;
+  return;
   // if no other vehicles, broadcast to first
   // if (array_num(vehicles) == 0) {
   //   if (array_num(pqueue) > 0) {
@@ -469,15 +457,20 @@ if (array_num(pqueue) > 0) {
   // }
 }
 
+// remove CV* c from priority queue
 void
 removeFromPqueue(struct cv* c) {
-  for (unsigned int i=0; i<array_num(pqueue); i++) {
-    if (array_get(pqueue, i) == c) {
-      array_remove(pqueue, i);
+  if (array_num(vehicles) > 0) {
+    for (unsigned int i=0; i<array_num(pqueue); i++) {
+      if (array_get(pqueue, i) == c) {
+        array_remove(pqueue, i);
+      }
     }
   }
+  return;
 }
 
+// remove Vehicle* v from vehicles[]
 void
 removeVehicle(Vehicle *v) {
   for (unsigned int i=0; i<array_num(vehicles); i++) {
@@ -486,6 +479,7 @@ removeVehicle(Vehicle *v) {
       break;
     }
   }
+  return;
 }
 
 /*
