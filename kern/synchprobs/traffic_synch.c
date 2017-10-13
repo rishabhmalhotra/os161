@@ -30,10 +30,10 @@ static struct cv *cv12;
 static struct lock *mutex;
 
 // priority queue for longest waiting cv:
-struct array *pqueue;
+volatile struct array *pqueue;
 
 // array with pointers to vehicles that are currently inside the intersection:
-struct array* vehicles;
+volatile struct array* vehicles;
 
 typedef struct Vehicle
 {
