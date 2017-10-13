@@ -231,7 +231,7 @@ intersection_before_entry(Direction origin, Direction destination)
   KASSERT(cv12 != NULL);
   KASSERT(mutex != NULL);
 
-  KASSERT (lock_do_i_hold(mutex));
+  KASSERT (!lock_do_i_hold(mutex));
   lock_acquire(mutex);
 
   // make vehicle
@@ -355,6 +355,8 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 checkForCvAndBroadcast(void) {
 
+KASSERT (lock_do_i_hold(mutex));
+
 if (array_num(pqueue) > 0) {
   if (array_get(pqueue, 0) == cv1) {
       if cv1trueconditions {
@@ -436,6 +438,16 @@ if (array_num(pqueue) > 0) {
   return;
 }
 
+void
+removeFromPqueue(Vehicle* v) {
+  for (unsigned int i=0; i<array_num(pqueue); i++) {
+    if ((v->origin == array_get(pqueue, i)->origin) && 
+          (v->destination == array_get(pqueue, i)->destination)) {
+      array_remove(pqueue, i);
+    }
+  }
+}
+
 /*
  * The simulation driver will call this function each time a vehicle
  * leaves the intersection.
@@ -465,7 +477,7 @@ intersection_after_exit(Direction origin, Direction destination)
   KASSERT(cv12 != NULL);
   KASSERT(mutex != NULL);
 
-  KASSERT (lock_do_i_hold(mutex));
+  KASSERT (!lock_do_i_hold(mutex));
   lock_acquire(mutex);
   // make vehicle
   Vehicle *v = kmalloc(sizeof(struct Vehicle));
@@ -476,46 +488,58 @@ intersection_after_exit(Direction origin, Direction destination)
   if (v->origin == north) {
     if (v->destination == south) {
       NS--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
       
     } else if (v->destination == east) {
       NE--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       NW--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     }
   } else if (v->origin == south) {
     if (v->destination == north) {
       SN--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     } else if (v->destination == east) {
       SE--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       SW--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     }
   } else if (v->origin == east) {
     if (v->destination == north) {
       EN--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     } else if (v->destination == south) {
       ES--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       EW--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     }
   } else {                                                                              // Origin is West
     if (v->destination == north) {
       WN--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     } else if (v->destination == south) {
       WS--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     } else {                                                                            // dest = east
       WE--;
+      removeFromPqueue(v;)
       checkForCvAndBroadcast();
     }
   }
