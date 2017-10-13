@@ -194,7 +194,7 @@ intersection_sync_cleanup(void)
   lock_destroy(mutex);
 
   array_destroy(pqueue);
-  array_destroy(vehicles);
+  // array_destroy(vehicles);
 
   cv_destroy(cv1);
   cv_destroy(cv2);
@@ -450,11 +450,11 @@ if (array_num(pqueue) > 0) {
   }
   return;
   // if no other vehicles, broadcast to first
-  // if (array_num(vehicles) == 0) {
-  //   if (array_num(pqueue) > 0) {
-  //     cv_broadcast(array_get(pqueue, 0), mutex);
-  //   }
-  // }
+  if (array_num(vehicles) == 0) {
+    if (array_num(pqueue) > 0) {
+      cv_broadcast(array_get(pqueue, 0), mutex);
+    }
+  }
 }
 
 // remove CV* c from priority queue
