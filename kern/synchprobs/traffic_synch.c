@@ -154,9 +154,15 @@ intersection_sync_init(void)
   // init pqueue
   pqueue = array_create();
   array_init(pqueue);
-
+  if (pqueue == NULL) {
+    panic("couldn't create pqueue");
+  }
+  // init vehicles
   vehicles = array_create();
   array_init(vehicles);
+  if (vehicles == NULL) {
+    panic("couldn't create vehicles");
+  }
 
   // create lock for above CV:
   mutex = lock_create("mutex");
@@ -380,7 +386,7 @@ checkForCvAndBroadcast(void) {
 KASSERT (lock_do_i_hold(mutex));
 // if the number of vehicles in intersection is 0, number of cv's in pqueue should be 0 too
 if ((array_num(vehicles) == 0) && (array_num(pqueue) != 0)) {
-  panic ("not zero\n");
+  panic ("pqueue not zero when vehicles is 0\n");
 }
 
 if (array_num(pqueue) > 0) {
@@ -450,11 +456,11 @@ if (array_num(pqueue) > 0) {
   }
   return;
   // if no other vehicles, broadcast to first
-  if (array_num(vehicles) == 0) {
-    if (array_num(pqueue) > 0) {
-      cv_broadcast(array_get(pqueue, 0), mutex);
-    }
-  }
+  // if (array_num(vehicles) == 0) {
+  //   if (array_num(pqueue) > 0) {
+  //     cv_broadcast(array_get(pqueue, 0), mutex);
+  //   }
+  // }
 }
 
 // remove CV* c from priority queue
@@ -474,6 +480,9 @@ removeFromPqueue(struct cv* c) {
 void
 removeVehicle(Vehicle *v) {
   for (unsigned int i=0; i<array_num(vehicles); i++) {
+    if ((i == array_num(vehicles) - 1) && (v != array_get(vehicles, i))) {
+      panic ("Vehicle v not found in array for removing\n");
+    }
     if (v == array_get(vehicles, i)) {
       array_remove(vehicles, i);
       break;
