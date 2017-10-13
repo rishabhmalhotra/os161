@@ -364,67 +364,67 @@ if (array_num(pqueue) > 0) {
     } else if (array_get(pqueue, 0) == cv2) {
       if cv2trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv2, mutex);
         return;
       } 
     } else if (array_get(pqueue, 0) == cv3) {
       if cv3trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv3, mutex);
         return;
       } 
     } else if (array_get(pqueue, 0) == cv4) {
       if cv4trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv4, mutex);
         return;
       }
     } else if (array_get(pqueue, 0) == cv5) {
       if cv5trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv5, mutex);
         return;
       } 
     } else if (array_get(pqueue, 0) == cv6) {
       if cv6trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv6, mutex);
         return;
       } 
     } else if (array_get(pqueue, 0) == cv7) {
       if cv7trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv7, mutex);
         return;
       } 
     } else if (array_get(pqueue, 0) == cv8) {
       if cv8trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv8, mutex);
         return;
       }
     } else if (array_get(pqueue, 0) == cv9) {
       if cv9trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv9, mutex);
         return;
       }
     } else if (array_get(pqueue, 0) == cv10) {
       if cv10trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv10, mutex);
         return;
       }
     } else if (array_get(pqueue, 0) == cv11) {
       if cv11trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv11, mutex);
         return;
       }
     } else if (array_get(pqueue, 0) == cv12) {
       if cv1trueconditions {
         array_remove(pqueue, 0);
-        cv_broadcast(cv1, mutex);
+        cv_broadcast(cv12, mutex);
         return;
       }
     } else {
@@ -432,6 +432,7 @@ if (array_num(pqueue) > 0) {
       cv1 += 0;
     }
   }
+  return;
 }
   // for (unsigned int i=0; i<array_num(pqueue); i++) {
   //   if (array_get(pqueue, i) == cv1) {
