@@ -54,7 +54,7 @@ volatile int WE = 0;        //    cv12
 
 // forward declaration
 void checkForCvAndBroadcast(void);
-void removeFromPqueue(Vehicle* v);
+void removeFromPqueue(struct cv* c);
 
 
 // macros for cv true conditions:
@@ -440,10 +440,9 @@ if (array_num(pqueue) > 0) {
 }
 
 void
-removeFromPqueue(Vehicle* v) {
+removeFromPqueue(struct cv* c) {
   for (unsigned int i=0; i<array_num(pqueue); i++) {
-    if ((v->origin == array_get(pqueue, i)->origin) && 
-          (v->destination == array_get(pqueue, i)->destination)) {
+    if (array_get(pqueue, i) == c) {
       array_remove(pqueue, i);
     }
   }
@@ -489,58 +488,58 @@ intersection_after_exit(Direction origin, Direction destination)
   if (v->origin == north) {
     if (v->destination == south) {
       NS--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv1);
       checkForCvAndBroadcast();
       
     } else if (v->destination == east) {
       NE--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv2);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       NW--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv3);
       checkForCvAndBroadcast();
     }
   } else if (v->origin == south) {
     if (v->destination == north) {
       SN--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv4);
       checkForCvAndBroadcast();
     } else if (v->destination == east) {
       SE--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv5);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       SW--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv6);
       checkForCvAndBroadcast();
     }
   } else if (v->origin == east) {
     if (v->destination == north) {
       EN--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv7);
       checkForCvAndBroadcast();
     } else if (v->destination == south) {
       ES--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv8);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       EW--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv9);
       checkForCvAndBroadcast();
     }
   } else {                                                                              // Origin is West
     if (v->destination == north) {
       WN--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv10);
       checkForCvAndBroadcast();
     } else if (v->destination == south) {
       WS--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv11);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = east
       WE--;
-      removeFromPqueue(v);
+      removeFromPqueue(cv12);
       checkForCvAndBroadcast();
     }
   }
