@@ -375,6 +375,7 @@ void
 checkForCvAndBroadcast(void) {
 
 KASSERT (lock_do_i_hold(mutex));
+KASSERT (if (array_num(vehicles) == 0) array_num(pqueue) == 0;)
 
 if (array_num(pqueue) > 0) {
   if (array_get(pqueue, 0) == cv1) {
@@ -456,11 +457,11 @@ if (array_num(pqueue) > 0) {
   }
   //return;
   // if no other vehicles, broadcast to first
-  if (array_num(vehicles) == 0) {
-    if (array_num(pqueue) > 0) {
-      cv_broadcast(array_get(pqueue, 0), mutex);
-    }
-  }
+  // if (array_num(vehicles) == 0) {
+  //   if (array_num(pqueue) > 0) {
+  //     cv_broadcast(array_get(pqueue, 0), mutex);
+  //   }
+  // }
 }
 
 void
