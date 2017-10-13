@@ -30,7 +30,7 @@ static struct cv *cv12;
 static struct lock *mutex;
 
 struct array *pqueue;
-Vehicle* array vehicles;
+struct array* vehicles;
 
 typedef struct Vehicle
 {
