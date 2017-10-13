@@ -231,6 +231,7 @@ intersection_before_entry(Direction origin, Direction destination)
   KASSERT(cv12 != NULL);
   KASSERT(mutex != NULL);
 
+  KASSERT (lock_do_i_hold(mutex));
   lock_acquire(mutex);
 
   // make vehicle
@@ -464,6 +465,7 @@ intersection_after_exit(Direction origin, Direction destination)
   KASSERT(cv12 != NULL);
   KASSERT(mutex != NULL);
 
+  KASSERT (lock_do_i_hold(mutex));
   lock_acquire(mutex);
   // make vehicle
   Vehicle *v = kmalloc(sizeof(struct Vehicle));
