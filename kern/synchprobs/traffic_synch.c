@@ -471,10 +471,10 @@ if (array_num(pqueue) > 0) {
 void
 removeFromPqueue(struct cv* c) {
   if (array_num(vehicles) > 0) {
-    if ((i == array_num(pqueue) - 1) && (array_get(pqueue, i) != c)) {
-      panic ("Couldn't find cv to remove from pqueue\n");
-    }
     for (unsigned int i=0; i<array_num(pqueue); i++) {
+      if ((i == array_num(pqueue) - 1) && (array_get(pqueue, i) != c)) {
+        panic ("Couldn't find cv to remove from pqueue\n");
+      }
       if (array_get(pqueue, i) == c) {
         array_remove(pqueue, i);
       }
