@@ -354,75 +354,76 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 checkForCvAndBroadcast(void) {
 
-  if (array_get(pqueue, 1) == cv1) {
+if (array_num > 0) {
+  if (array_get(pqueue, 0) == cv1) {
       if cv1trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       }
-    } else if (array_get(pqueue, 1) == cv2) {
+    } else if (array_get(pqueue, 0) == cv2) {
       if cv2trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       } 
-    } else if (array_get(pqueue, 1) == cv3) {
+    } else if (array_get(pqueue, 0) == cv3) {
       if cv3trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       } 
-    } else if (array_get(pqueue, 1) == cv4) {
+    } else if (array_get(pqueue, 0) == cv4) {
       if cv4trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       }
-    } else if (array_get(pqueue, 1) == cv5) {
+    } else if (array_get(pqueue, 0) == cv5) {
       if cv5trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       } 
-    } else if (array_get(pqueue, 1) == cv6) {
+    } else if (array_get(pqueue, 0) == cv6) {
       if cv6trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       } 
-    } else if (array_get(pqueue, 1) == cv7) {
+    } else if (array_get(pqueue, 0) == cv7) {
       if cv7trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       } 
-    } else if (array_get(pqueue, 1) == cv8) {
+    } else if (array_get(pqueue, 0) == cv8) {
       if cv8trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       }
-    } else if (array_get(pqueue, 1) == cv9) {
+    } else if (array_get(pqueue, 0) == cv9) {
       if cv9trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       }
-    } else if (array_get(pqueue, 1) == cv10) {
+    } else if (array_get(pqueue, 0) == cv10) {
       if cv10trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       }
-    } else if (array_get(pqueue, 1) == cv11) {
+    } else if (array_get(pqueue, 0) == cv11) {
       if cv11trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       }
-    } else if (array_get(pqueue, 1) == cv12) {
+    } else if (array_get(pqueue, 0) == cv12) {
       if cv1trueconditions {
-        array_remove(pqueue, 1);
+        array_remove(pqueue, 0);
         cv_broadcast(cv1, mutex);
         return;
       }
@@ -431,6 +432,7 @@ checkForCvAndBroadcast(void) {
       cv1 += 0;
     }
   }
+}
   // for (unsigned int i=0; i<array_num(pqueue); i++) {
   //   if (array_get(pqueue, i) == cv1) {
   //     if cv1trueconditions {
