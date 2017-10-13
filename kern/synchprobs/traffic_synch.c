@@ -366,7 +366,7 @@ if (array_num(pqueue) > 0) {
         array_remove(pqueue, 0);
         cv_broadcast(cv2, mutex);
         return;
-      } 
+      }
     } else if (array_get(pqueue, 0) == cv3) {
       if cv3trueconditions {
         array_remove(pqueue, 0);
@@ -429,90 +429,11 @@ if (array_num(pqueue) > 0) {
       }
     } else {
       // do nothing
-      cv1 += 0;
+      return;
     }
   }
   return;
 }
-  // for (unsigned int i=0; i<array_num(pqueue); i++) {
-  //   if (array_get(pqueue, i) == cv1) {
-  //     if cv1trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv1, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv2) {
-  //     if cv2trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv2, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv3) {
-  //     if cv3trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv3, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv4) {
-  //     if cv4trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv4, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv5) {
-  //     if cv5trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv5, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv6) {
-  //     if cv6trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv6, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv7) {
-  //     if cv7trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv7, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv8) {
-  //     if cv8trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv8, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv9) {
-  //     if cv9trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv9, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv10) {
-  //     if cv10trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv10, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv11) {
-  //     if cv11trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv11, mutex);
-  //       return;
-  //     }
-  //   } else if (array_get(pqueue, i) == cv12) {
-  //     if cv12trueconditions {
-  //       array_remove(pqueue, i);
-  //       cv_broadcast(cv12, mutex);
-  //       return;
-  //     }
-  //   } else {
-  //     // never reach here:
-  //     panic("should have never reached here!! deadlock!!!");
-  //   }
-  // }
-//}
 
 /*
  * The simulation driver will call this function each time a vehicle
