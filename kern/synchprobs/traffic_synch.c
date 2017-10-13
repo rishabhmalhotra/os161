@@ -29,7 +29,10 @@ static struct cv *cv12;
 // Lock for CV:
 static struct lock *mutex;
 
+// priority queue for longest waiting cv:
 struct array *pqueue;
+
+// array with pointers to vehicles that are currently inside the intersection:
 struct array* vehicles;
 
 typedef struct Vehicle
@@ -191,7 +194,7 @@ intersection_sync_cleanup(void)
   lock_destroy(mutex);
 
   array_destroy(pqueue);
-  //array_destroy(vehicles);
+  array_destroy(vehicles);
 
   cv_destroy(cv1);
   cv_destroy(cv2);
