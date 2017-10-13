@@ -54,6 +54,7 @@ volatile int WE = 0;        //    cv12
 
 // forward declaration
 void checkForCvAndBroadcast(void);
+void removeFromPqueue(Vehicle* v);
 
 
 // macros for cv true conditions:
