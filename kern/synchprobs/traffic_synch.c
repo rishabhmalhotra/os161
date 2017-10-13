@@ -482,9 +482,9 @@ removeFromPqueue(struct cv* c) {
 void
 removeVehicle(Vehicle *v) {
   for (unsigned int i=0; i<array_num(vehicles); i++) {
-    if ((i == array_num(vehicles) - 1) && (v != array_get(vehicles, i))) {
-      panic ("Vehicle v not found in array for removing\n");
-    }
+    // if ((i == array_num(vehicles) - 1) && (v != array_get(vehicles, i))) {
+    //   panic ("Vehicle v not found in array for removing\n");
+    // }
     if (v == array_get(vehicles, i)) {
       array_remove(vehicles, i);
       break;
