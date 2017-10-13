@@ -488,58 +488,58 @@ intersection_after_exit(Direction origin, Direction destination)
   if (v->origin == north) {
     if (v->destination == south) {
       NS--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
       
     } else if (v->destination == east) {
       NE--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       NW--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     }
   } else if (v->origin == south) {
     if (v->destination == north) {
       SN--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     } else if (v->destination == east) {
       SE--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       SW--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     }
   } else if (v->origin == east) {
     if (v->destination == north) {
       EN--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     } else if (v->destination == south) {
       ES--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = west
       EW--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     }
   } else {                                                                              // Origin is West
     if (v->destination == north) {
       WN--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     } else if (v->destination == south) {
       WS--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     } else {                                                                            // dest = east
       WE--;
-      removeFromPqueue(v;)
+      removeFromPqueue(v);
       checkForCvAndBroadcast();
     }
   }
