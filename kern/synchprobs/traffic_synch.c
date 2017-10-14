@@ -369,9 +369,7 @@ intersection_before_entry(Direction origin, Direction destination)
         while cv12falseconditions {
           cv_wait(cv12, mutex);
         }
-        if (array_add(vehicles, v, NULL) == 0) {
-          panic ("couldn't add to array\n");
-        }
+        array_add(vehicles, v, NULL);
         WE++;
     }
   }
@@ -472,6 +470,7 @@ void
 removeFromPqueue(struct cv* c) {
   if (array_num(vehicles) > 0) {
     for (unsigned int i=0; i<array_num(pqueue); i++) {
+      // CV NEEDS to be in this array if I'm calling it
       if ((i == array_num(pqueue) - 1) && (array_get(pqueue, i) != c)) {
         panic ("Couldn't find cv to remove from pqueue\n");
       }
@@ -487,9 +486,10 @@ removeFromPqueue(struct cv* c) {
 void
 removeVehicle(Vehicle *v) {
   for (unsigned int i=0; i<array_num(vehicles); i++) {
-    // if ((i == array_num(vehicles) - 1) && (v != array_get(vehicles, i))) {
-    //   panic ("Vehicle v not found in array for removing\n");
-    // }
+    // vehicle NEEDS to be in this array if I'm calling it
+    if ((i == array_num(vehicles) - 1) && (v != array_get(vehicles, i))) {
+      panic ("Vehicle v not found in array for removing\n");
+    }
     if (v == array_get(vehicles, i)) {
       array_remove(vehicles, i);
       break;
