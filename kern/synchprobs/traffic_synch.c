@@ -485,6 +485,7 @@ removeFromPqueue(struct cv* c) {
 // remove Vehicle* v from vehicles[]
 void
 removeVehicle(Vehicle *v) {
+  kprintf("%d\n", array_num(vehicles));
   for (unsigned int i=0; i<array_num(vehicles); i++) {
     // vehicle NEEDS to be in this array if I'm calling it
     if ((i == array_num(vehicles) - 1) && (v != array_get(vehicles, i))) {
