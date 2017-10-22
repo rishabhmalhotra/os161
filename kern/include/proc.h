@@ -1,4 +1,4 @@
-/*
+p/*
  * Copyright (c) 2013
  *	The President and Fellows of Harvard College.
  *
@@ -38,6 +38,8 @@
 
 #include <spinlock.h>
 #include <thread.h> /* required for struct threadarray */
+#include <array.h>
+#include "opt-A2.h"
 
 struct addrspace;
 struct vnode;
@@ -58,6 +60,13 @@ struct proc {
 
 	/* VFS */
 	struct vnode *p_cwd;		/* current working directory */
+
+	#if OPT_A2
+		volatile pid_t pid;						/* pid for this process */
+		struct array* childrenprocs;	/* array of pointers to child procs */
+		struct proc *parent;			/* pointer to its parent (NULL if no parent) */
+	#endif
+
 
 #ifdef UW
   /* a vnode to refer to the console device */

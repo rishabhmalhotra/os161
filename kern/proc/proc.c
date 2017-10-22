@@ -50,11 +50,22 @@
 #include <vfs.h>
 #include <synch.h>
 #include <kern/fcntl.h>  
+#include <array.h>
+#include <limits.h>
+#include "opt-A2.h"
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
  */
 struct proc *kproc;
+
+#if OPT_A2
+  volatile pid_t pid_var = 2;
+#endif
+// #if OPT_A2
+	// global array of (proc pointers) indexed from 2 for keeping track of pids
+	// struct array *procedures;
+// #endif
 
 /*
  * Mechanism for making the kernel menu thread sleep while processes are running
@@ -69,7 +80,9 @@ static struct semaphore *proc_count_mutex;
 struct semaphore *no_proc_sem;   
 #endif  // UW
 
-
+// // add NULL pointers to indices 0,1 so that proc addressing starts from index 2
+// array_add(procedures, NULL, NULL);
+// array_add(procedures, NULL, NULL);
 
 /*
  * Create a proc structure.
@@ -89,6 +102,13 @@ proc_create(const char *name)
 		kfree(proc);
 		return NULL;
 	}
+	#if OPT_A2
+		proc->childrenprocs = array_create();
+		if (proc->childrenprocs == NULL) {
+			panic("couldn't create childrenprocs[]\n");
+		}
+		proc->parent = NULL:
+	#endif
 
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);
@@ -123,6 +143,20 @@ proc_destroy(struct proc *proc)
 
 	KASSERT(proc != NULL);
 	KASSERT(proc != kproc);
+
+	#if OPT_A2
+	// remove this proc from parent parent's children array
+	spinlock_acquire((proc->parent)->p_lock);
+	if (proc->parent != NULL) {
+		for (unsigned int i=0; i<(proc->parent)->childrenprocs; i++) {
+			if (array_get(((proc->parent)->childrenprocs), i) == proc) {
+				array_remove(((proc->parent)->childrenprocs), i);
+				break;
+			}
+		}
+	}
+	spinlock_release((proc->parent)->p_lock);
+	#endif // OPT_A2
 
 	/*
 	 * We don't take p_lock in here because we must have the only
@@ -166,8 +200,8 @@ proc_destroy(struct proc *proc)
 	threadarray_cleanup(&proc->p_threads);
 	spinlock_cleanup(&proc->p_lock);
 
-	kfree(proc->p_name);
-	kfree(proc);
+	// kfree(proc->p_name);
+	// kfree(proc);
 
 #ifdef UW
 	/* decrement the process count */
@@ -176,6 +210,23 @@ proc_destroy(struct proc *proc)
 	   the proc_count unconditionally here */
 	P(proc_count_mutex); 
 	KASSERT(proc_count > 0);
+
+	#if OPT_A2
+		KASSERT(procedures != NULL);
+
+		for (unsigned int i=0; i<array_num(procedures); i++) {
+			if (array_get(procedures, i) == proc) {
+				// set to NULL, don't remove because it'll slide following entries back
+				array_set(procedures, i, NULL);
+				break;
+			}
+		}
+
+	#endif		// OPT_A2
+
+	kfree(proc->p_name);
+	kfree(proc);
+
 	proc_count--;
 	/* signal the kernel menu thread if the process count has reached zero */
 	if (proc_count == 0) {
@@ -207,6 +258,17 @@ proc_bootstrap(void)
   if (no_proc_sem == NULL) {
     panic("could not create no_proc_sem semaphore\n");
   }
+
+#if OPT_A2
+  pid_var = 2;
+#endif		// OPT_A2
+  // #if OPT_A2
+  // 	// init procedures[]
+  // 	procedures = array_create();
+  // 	if (procedures == NULL) {
+  // 		panic("could not create array procedures\n");
+  // 	}
+  // #endif	// OPT_A2
 #endif // UW 
 }
 
@@ -258,7 +320,7 @@ proc_create_runprogram(const char *name)
 	if (curproc->p_cwd != NULL) {
 		VOP_INCREF(curproc->p_cwd);
 		proc->p_cwd = curproc->p_cwd;
-	}
+	} 
 	spinlock_release(&curproc->p_lock);
 #endif // UW
 
@@ -269,6 +331,25 @@ proc_create_runprogram(const char *name)
 	P(proc_count_mutex); 
 	proc_count++;
 	V(proc_count_mutex);
+
+	// whenever a process is created, it is added to procedures & the array index is it's PID, removal in proc_destroy()
+	// #if OPT_A2
+		// // add newly created proc to array and implement reusability
+		// if ((array_get(procedures, array_num(procedures)-1)) == 32767) {					// __PID_MAX = 32767
+		// 	for (unsigned int i=0; i<array_num(procedures); i++) {
+		// 		if ((array_get(procedures, i) == NULL) && ((i != 0) || (i != 1))) {			// case when prev proc has been removed
+		// 			array_set(procedures, i, proc);
+		// 			// set pid for proc
+		// 			proc->pid = (pid_t)i;
+		// 			break;
+		// 		}
+		// 	}
+		// } else {
+		// 	array_add(procedures, proc, NULL);
+		// }
+
+	// #endif	// OPT_A2
+
 #endif // UW
 
 	return proc;
@@ -364,3 +445,20 @@ curproc_setas(struct addrspace *newas)
 	spinlock_release(&proc->p_lock);
 	return oldas;
 }
+
+#if OPT_A2
+	/*
+ 	* Change the address space of the given process
+ 	*/
+
+	void
+	proc_setas(struct proc *proc, struct addrspace *childAddrspace) {
+		struct proc *proc = proc;
+
+		spinlock_acquire(&proc->p_lock);
+		proc->p_addrspace = newas;
+		spinlock_release(&proc->p_lock);
+		return;
+	}
+#endif	// OPT_A2
+

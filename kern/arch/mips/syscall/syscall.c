@@ -35,6 +35,7 @@
 #include <thread.h>
 #include <current.h>
 #include <syscall.h>
+#include "opt-A2.h"
 
 
 /*
@@ -131,6 +132,12 @@ syscall(struct trapframe *tf)
 	  break;
 #endif // UW
 
+#if OPT_A2
+	  case SYS_fork:
+	  	err = sys_fork((void *)tf);
+	  break;
+#endif
+
 	    /* Add stuff here */
  
 	default:
@@ -177,7 +184,12 @@ syscall(struct trapframe *tf)
  * Thus, you can trash it and do things another way if you prefer.
  */
 void
-enter_forked_process(struct trapframe *tf)
+enter_forked_process(void *tf, unsigned long data2)
 {
-	(void)tf;
+	void (data2);							// silence warning since we don't need this parameter
+	struct trapframe *localTrap = (struct trapframe *)tf;
+	localTrap->tf_a3 = 0;					// successful return
+	localTrap->tf_v0 = 0;					// no error because successful return
+	localTrap->tf_epc += 4;
+	mips_usermode(localTrap);
 }

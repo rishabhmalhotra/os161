@@ -37,14 +37,14 @@ struct trapframe; /* from <machine/trapframe.h> */
  * The system call dispatcher.
  */
 
-void syscall(struct trapframe *tf);
+void syscall(void *tf);
 
 /*
  * Support functions.
  */
 
 /* Helper for fork(). You write this. */
-void enter_forked_process(struct trapframe *tf);
+void enter_forked_process(void *tf, unsigned int data2);
 
 /* Enter user mode. Does not return. */
 void enter_new_process(int argc, userptr_t argv, vaddr_t stackptr,
@@ -63,6 +63,7 @@ int sys_write(int fdesc,userptr_t ubuf,unsigned int nbytes,int *retval);
 void sys__exit(int exitcode);
 int sys_getpid(pid_t *retval);
 int sys_waitpid(pid_t pid, userptr_t status, int options, pid_t *retval);
+pid_t sys_fork(struct trapframe *tf);
 
 #endif // UW
 

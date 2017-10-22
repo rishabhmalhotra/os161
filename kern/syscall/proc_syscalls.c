@@ -9,6 +9,7 @@
 #include <thread.h>
 #include <addrspace.h>
 #include <copyinout.h>
+#include "opt-A2.h"
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
@@ -92,3 +93,51 @@ sys_waitpid(pid_t pid,
   return(0);
 }
 
+#if OPT_A2
+
+pid_t
+sys_fork(void *tf) {
+
+  KASSERT(curproc != NULL);
+  KASSERT(curproc->p_addrspace != NULL);
+
+  // create structure for child process
+  struct proc *childproc;
+  childproc = proc_create_runprogram("new child process");
+  // if error returned:
+  if (childproc == NULL) {
+    return ENOMEM;
+  }
+
+  // create new address space, copy pages from old address space to newly created one (in newSpace)
+  int copy;
+  struct addrspace *newSpace;
+  copy = as_copy(curproc->p_addrspace, newSpace);
+  // if error returned:
+  if (copy != 0) {
+    return ENOMEM;
+  }
+
+  // now associate the newSpace with the child proc:
+  proc_setas(childproc, newSpace);
+
+  // set pid of child
+  spinlock_acquire(&childproc->p_lock);
+  childproc->pid = pid_var;
+  pid_var++;
+  spinlock_release(&childproc->p_lock);
+
+  // add childproc to the children array of its parent
+  spinlock_acquire(&curproc->p_lock);
+  array_add(curproc->childrenprocs, childproc, NULL);
+  childproc->parent = curproc;
+  spinlock_release(&curproc->p_lock);
+
+  // thread_fork() to create new thread:
+  unsigned long data2 = 0;
+  void *heaptf = kmalloc(sizeof(void *tf));                                           // heaptf is (parent) tf on the heap
+  thread_fork("childThread", childproc, enter_forked_process(heaptf, data2), heaptf, data2);
+  kfree(heaptf);
+}
+
+#endif  // OPT_A2
