@@ -9,7 +9,6 @@
 #include <thread.h>
 #include <addrspace.h>
 #include <copyinout.h>
-#include <spinlock.h>
 #include "opt-A2.h"
 
   /* this implementation of sys__exit does not do anything with the exit code */
@@ -126,13 +125,15 @@ sys_fork(void *tf) {
   spinlock_acquire(&childproc->p_lock);
   childproc->pid = pid_var;
   pid_var++;
+  array_add(curproc->childrenprocs, childproc, NULL);
+  childproc->parent = curproc;
   spinlock_release(&childproc->p_lock);
 
   // add childproc to the children array of its parent
-  spinlock_acquire(&curproc->p_lock);
-  array_add(curproc->childrenprocs, childproc, NULL);
-  childproc->parent = curproc;
-  spinlock_release(&curproc->p_lock);
+  // spinlock_acquire(&curproc->p_lock);
+  // array_add(curproc->childrenprocs, childproc, NULL);
+  // childproc->parent = curproc;
+  // spinlock_release(&curproc->p_lock);
 
   // thread_fork() to create new thread:
   unsigned long data2 = 0;
