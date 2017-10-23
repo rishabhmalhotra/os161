@@ -111,8 +111,7 @@ sys_fork(void *tf) {
   // create new address space, copy pages from old address space to newly created one (in newSpace)
   int copy;
   struct addrspace *newSpace;
-  struct addrspace ** nSpace = &newSpace;
-  copy = as_copy(curproc->p_addrspace, &nSpace);
+  copy = as_copy(curproc->p_addrspace, &newSpace);
   // if error returned:
   if (copy != 0) {
     return ENOMEM;
