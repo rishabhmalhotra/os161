@@ -137,8 +137,7 @@ sys_fork(void *tf) {
   void *heaptf = kmalloc(sizeof(*tf));                                           // heaptf is (parent) tf on the heap
   heaptf = tf;
   thread_fork("childThread", childproc, enter_forked_process(heaptf, data2), heaptf, data2);
-  kfree(heaptf);
-
+  //kfree(heaptf);
 
   return 0;
 }
