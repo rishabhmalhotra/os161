@@ -46,6 +46,8 @@ void syscall(void *tf);
 /* Helper for fork(). You write this. */
 void enter_forked_process(void *tf, unsigned int data2);
 
+void init_enter_forked_process(void *data1, unsigned long data2);
+
 /* Enter user mode. Does not return. */
 void enter_new_process(int argc, userptr_t argv, vaddr_t stackptr,
 		       vaddr_t entrypoint);
