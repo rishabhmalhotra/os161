@@ -101,7 +101,7 @@ void init_enter_forked_process(void *data1, unsigned long data2)
 {
     struct trapframe *tf = (struct trapframe *)data1;
     (void) data2;
-    enter_forked_process(tf);
+    enter_forked_process(tf, 0);
 }
 
 pid_t
