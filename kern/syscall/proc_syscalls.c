@@ -9,6 +9,9 @@
 #include <thread.h>
 #include <addrspace.h>
 #include <copyinout.h>
+#include <array.h>
+#include <mips/trapframe.h>
+#include <limits.h>
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
@@ -105,20 +108,21 @@ sys_fork(void *tf) {
   childproc = proc_create_runprogram("new child process");
   // if error returned:
   if (childproc == NULL) {
-    return ENOMEM;
+    return ENPROC;
   }
 
   // create new address space, copy pages from old address space to newly created one (in newSpace)
   int copy;
-  struct addrspace *newSpace;
-  copy = as_copy(curproc->p_addrspace, &newSpace);
-  // if error returned:
-  if (copy != 0) {
+  copy = as_copy(curproc_getas(), &(childproc->p_addrspace));
+  
+  // either as_copy() failed or no addrspace of childproc:
+  if ((copy != 0) || (childproc->p_addrspace == NULL)) {
+    proc_destroy(childproc);
     return ENOMEM;
   }
 
   // now associate the newSpace with the child proc:
-  proc_setas(childproc, newSpace);
+  //proc_setas(childproc, newSpace);
 
   // set pid of child
   spinlock_acquire(&childproc->p_lock);
@@ -126,18 +130,25 @@ sys_fork(void *tf) {
   pid_var++;
   spinlock_release(&childproc->p_lock);
 
+
+  // thread_fork() to create new thread:
+  unsigned long data2 = 0;
+  void *heaptf = kmalloc(sizeof(*tf));                                           // heaptf is (parent) tf on the heap
+  heaptf = tf;
+  memcpy(heaptf,tf, sizeof(*tf));
+  int err_no = thread_fork("childThread", childproc, enter_forked_process(heaptf, data2), heaptf, data2);
+  if (err_no) {
+    proc_destroy(childproc);
+    kfree(heaptf);
+    heaptf = NULL;
+    return err;
+  }
+
   // add childproc to the children array of its parent
   spinlock_acquire(&curproc->p_lock);
   array_add(curproc->childrenprocs, childproc, NULL);
   childproc->parent = curproc;
   spinlock_release(&curproc->p_lock);
-
-  // thread_fork() to create new thread:
-  unsigned long data2 = 0;
-  (void *)heaptf = kmalloc(sizeof(*tf));                                           // heaptf is (parent) tf on the heap
-  heaptf = tf;
-  thread_fork("childThread", childproc, enter_forked_process(heaptf, data2), heaptf, data2);
-  kfree(heaptf);
 
   return 0;
 }
