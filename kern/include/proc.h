@@ -48,7 +48,7 @@ struct semaphore;
 #endif // UW
 
 #if OPT_A2
-volatile pid_t pid;
+extern volatile pid_t pid;
 #endif
 
 /*
