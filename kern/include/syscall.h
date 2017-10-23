@@ -44,7 +44,7 @@ void syscall(struct trapframe *tf);
  */
 
 /* Helper for fork(). You write this. */
-void enter_forked_process(void *tf, unsigned int data2);
+void enter_forked_process(void *tf, unsigned long data2);
 
 void init_enter_forked_process(void *data1, unsigned long data2);
 
