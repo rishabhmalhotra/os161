@@ -37,7 +37,7 @@ struct trapframe; /* from <machine/trapframe.h> */
  * The system call dispatcher.
  */
 
-void syscall(void *tf);
+void syscall(struct trapframe *tf);
 
 /*
  * Support functions.
