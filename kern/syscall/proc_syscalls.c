@@ -134,9 +134,13 @@ sys_fork(void *tf) {
 
   // thread_fork() to create new thread:
   unsigned long data2 = 0;
-  void *heaptf = kmalloc(4);                                           // heaptf is (parent) tf on the heap
+  void *heaptf = kmalloc(sizeof(tf));                                           // heaptf is (parent) tf on the heap
+  heaptf = tf;
   thread_fork("childThread", childproc, enter_forked_process(heaptf, data2), heaptf, data2);
   kfree(heaptf);
+
+
+  return 0;
 }
 
 #endif  // OPT_A2
