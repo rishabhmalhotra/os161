@@ -109,5 +109,8 @@ struct addrspace *curproc_getas(void);
 /* Change the address space of the current process, and return the old one. */
 struct addrspace *curproc_setas(struct addrspace *);
 
+#if OPT_A2
+	void proc_setas(struct proc *proc, struct addrspace *childAddrspace);
+#endif
 
 #endif /* _PROC_H_ */
