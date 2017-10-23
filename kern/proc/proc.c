@@ -211,18 +211,18 @@ proc_destroy(struct proc *proc)
 	P(proc_count_mutex); 
 	KASSERT(proc_count > 0);
 
-	#if OPT_A2
-		KASSERT(procedures != NULL);
+	// #if OPT_A2
+	// 	KASSERT(procedures != NULL);
 
-		for (unsigned int i=0; i<array_num(procedures); i++) {
-			if (array_get(procedures, i) == proc) {
-				// set to NULL, don't remove because it'll slide following entries back
-				array_set(procedures, i, NULL);
-				break;
-			}
-		}
+	// 	for (unsigned int i=0; i<array_num(procedures); i++) {
+	// 		if (array_get(procedures, i) == proc) {
+	// 			// set to NULL, don't remove because it'll slide following entries back
+	// 			array_set(procedures, i, NULL);
+	// 			break;
+	// 		}
+	// 	}
 
-	#endif		// OPT_A2
+	// #endif		// OPT_A2
 
 	kfree(proc->p_name);
 	kfree(proc);
@@ -453,10 +453,9 @@ curproc_setas(struct addrspace *newas)
 
 	void
 	proc_setas(struct proc *proc, struct addrspace *childAddrspace) {
-		struct proc *proc = proc;
 
 		spinlock_acquire(&proc->p_lock);
-		proc->p_addrspace = newas;
+		proc->p_addrspace = childAddrspace;
 		spinlock_release(&proc->p_lock);
 		return;
 	}
