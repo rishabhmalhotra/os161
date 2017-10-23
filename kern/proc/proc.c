@@ -107,7 +107,7 @@ proc_create(const char *name)
 		if (proc->childrenprocs == NULL) {
 			panic("couldn't create childrenprocs[]\n");
 		}
-		proc->parent = NULL:
+		proc->parent = NULL;
 	#endif
 
 	threadarray_init(&proc->p_threads);
@@ -148,7 +148,7 @@ proc_destroy(struct proc *proc)
 	// remove this proc from parent parent's children array
 	spinlock_acquire((proc->parent)->p_lock);
 	if (proc->parent != NULL) {
-		for (unsigned int i=0; i<(proc->parent)->childrenprocs; i++) {
+		for (unsigned int i=0; i<array_num((proc->parent)->childrenprocs); i++) {
 			if (array_get(((proc->parent)->childrenprocs), i) == proc) {
 				array_remove(((proc->parent)->childrenprocs), i);
 				break;
