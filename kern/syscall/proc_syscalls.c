@@ -97,6 +97,13 @@ sys_waitpid(pid_t pid,
 
 #if OPT_A2
 
+void init_enter_forked_process(void *data1, unsigned long data2)
+{
+    struct trapframe *tf = (struct trapframe *)data1;
+    (void) data2;
+    enter_forked_process(tf);
+}
+
 pid_t
 sys_fork(void *tf) {
 
@@ -135,7 +142,7 @@ sys_fork(void *tf) {
   struct trapframe *heaptf = kmalloc(sizeof(*tf));                  // heaptf is (parent) tf on the heap
   heaptf = tf;
   memcpy(heaptf,tf, sizeof(*tf));
-  int err_no = thread_fork(curthread->t_name, childproc, *(enter_forked_process(heaptf, 0)), heaptf, 0);
+  int err_no = thread_fork(curthread->t_name, childproc, &init_enter_forked_process, heaptf, 0);
   if (err_no) {
     proc_destroy(childproc);
     kfree(heaptf);
