@@ -132,11 +132,10 @@ sys_fork(void *tf) {
 
 
   // thread_fork() to create new thread:
-  unsigned long data2 = 0;
   void *heaptf = kmalloc(sizeof(*tf));                                           // heaptf is (parent) tf on the heap
   heaptf = tf;
   memcpy(heaptf,tf, sizeof(*tf));
-  int err_no = thread_fork(curthread->t_name, childproc, &enter_forked_process, heaptf, data2);
+  int err_no = thread_fork(curthread->t_name, childproc, &enter_forked_process, heaptf, 0);
   if (err_no) {
     proc_destroy(childproc);
     kfree(heaptf);
