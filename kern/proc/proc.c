@@ -60,7 +60,7 @@
 struct proc *kproc;
 
 #if OPT_A2
-  extern volatile pid_t pid_var = 2;
+  volatile pid_t pid_var = 2;
 #endif
 // #if OPT_A2
 	// global array of (proc pointers) indexed from 2 for keeping track of pids
