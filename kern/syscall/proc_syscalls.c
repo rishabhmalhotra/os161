@@ -105,7 +105,7 @@ void init_enter_forked_process(void *data1, unsigned long data2)
 }
 
 pid_t
-sys_fork(void *tf) {
+sys_fork(void *tf, pid_t *retval) {
 
   KASSERT(curproc != NULL);
   KASSERT(curproc->p_addrspace != NULL);
@@ -144,9 +144,10 @@ sys_fork(void *tf) {
   memcpy(heaptf,tf, sizeof(*tf));
   int err_no = thread_fork(curthread->t_name, childproc, &init_enter_forked_process, heaptf, 0);
   if (err_no) {
+    as_deactivate();
     proc_destroy(childproc);
     kfree(heaptf);
-    heaptf = NULL;
+    // heaptf = NULL;
     return err_no;
   }
 
@@ -156,6 +157,7 @@ sys_fork(void *tf) {
   childproc->parent = curproc;
   spinlock_release(&curproc->p_lock);
 
+  *retval = childproc->pid;
   return 0;
 }
 
