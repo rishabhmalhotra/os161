@@ -118,6 +118,8 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   childproc->parent = curproc;
   spinlock_release(&curproc->p_lock);
 
+  KASSERT(childproc->parent != NULL);
+
   // create new address space, copy pages from old address space to newly created one (in newSpace)
   childproc->p_addrspace = as_create();
   int copy = as_copy(curproc_getas(), &(childproc->p_addrspace));
