@@ -141,7 +141,6 @@ sys_fork(void *tf, pid_t *retval) {
 
   // thread_fork() to create new thread:
   struct trapframe *heaptf = kmalloc(sizeof(*tf));                  // heaptf is (parent) tf on the heap
-  heaptf = tf;
   memcpy(heaptf,tf, sizeof(*tf));
   int err_no = thread_fork(curthread->t_name, childproc, &init_enter_forked_process, heaptf, 0);
   if (err_no) {
