@@ -120,7 +120,7 @@ sys_fork(void *tf, pid_t *retval) {
 
   // create new address space, copy pages from old address space to newly created one (in newSpace)
   int copy;
-  childproc->addrspace = as_create();
+  childproc->p_addrspace = as_create();
   copy = as_copy(curproc_getas(), &(childproc->p_addrspace));
   
   // either as_copy() failed or no addrspace of childproc:
