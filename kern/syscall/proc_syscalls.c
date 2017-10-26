@@ -106,7 +106,7 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // create structure for child process
   struct proc *childproc;
-  childproc = proc_create_runprogram("new child process");
+  childproc = proc_create_runprogram(curproc->p_name);
   // if error returned:
   if (childproc == NULL) {
     return ENPROC;
@@ -128,10 +128,10 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // set pid of child
   spinlock_acquire(&childproc->p_lock);
-  P(pid_var_mutex);
+  // P(pid_var_mutex);
   childproc->pid = pid_var;
   pid_var++;
-  V(pid_var_mutex);
+  // V(pid_var_mutex);
   spinlock_release(&childproc->p_lock);
 
 
@@ -148,10 +148,10 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   }
 
   // add childproc to the children array of its parent
-  spinlock_acquire(&curproc->p_lock);
+  //spinlock_acquire(&curproc->p_lock);
   array_add(curproc->childrenprocs, childproc, NULL);
   childproc->parent = curproc;
-  spinlock_release(&curproc->p_lock);
+  //spinlock_release(&curproc->p_lock);
 
   *retval = childproc->pid;
   return 0;
