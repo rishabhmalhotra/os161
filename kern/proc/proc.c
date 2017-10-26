@@ -61,7 +61,7 @@ struct proc *kproc;
 
 #if OPT_A2
   volatile pid_t pid_var = 2;
-  static struct semaphore *pid_var_mutex;
+  struct semaphore *pid_var_mutex;
 #endif
 
 /*
