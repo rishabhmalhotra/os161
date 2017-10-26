@@ -126,12 +126,12 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   //proc_setas(childproc, newSpace);
 
   // set pid of child
-  // spinlock_acquire(&childproc->p_lock);
-  // // P(pid_var_mutex);
-  // childproc->pid = pid_var;
-  // pid_var++;
-  // // V(pid_var_mutex);
-  // spinlock_release(&childproc->p_lock);
+  spinlock_acquire(&childproc->p_lock);
+  // P(pid_var_mutex);
+  childproc->pid = pid_var;
+  pid_var++;
+  // V(pid_var_mutex);
+  spinlock_release(&childproc->p_lock);
 
 
   // thread_fork() to create new thread:
@@ -148,7 +148,7 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // add childproc to the children array of its parent
   //spinlock_acquire(&curproc->p_lock);
-  array_add(&curproc->childrenprocs, childproc, NULL);
+  array_add(curproc->childrenprocs, childproc, NULL);
   childproc->parent = curproc;
   //spinlock_release(&curproc->p_lock);
 
