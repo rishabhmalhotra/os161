@@ -128,9 +128,6 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENOMEM;
   }
 
-  // now associate the newSpace with the child proc:
-  //proc_setas(childproc, newSpace);
-
   // set pid of child
   P(pid_var_mutex);
   childproc->pid = pid_var;
