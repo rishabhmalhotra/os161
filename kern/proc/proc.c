@@ -142,6 +142,7 @@ proc_destroy(struct proc *proc)
 	KASSERT(proc != kproc);
 
 	#if OPT_A2
+	KASSERT(proc->parent != NULL);
 	// remove this proc from parent parent's children array
 	// spinlock_acquire(&(proc->parent)->p_lock);
 	// put in some mutex
