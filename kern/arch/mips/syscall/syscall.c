@@ -186,8 +186,7 @@ syscall(struct trapframe *tf)
 void
 enter_forked_process(void *tf, unsigned long data2)
 {
-	// data2 = 20;							// silence warning since we don't need this parameter
-	(void)data2;
+	(void)data2;							// silence warning since we don't need this parameter
 	struct trapframe *tftemp = tf;
 	struct trapframe localTrap = *tftemp;
 	localTrap.tf_a3 = 0;					// successful return
