@@ -112,6 +112,12 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENPROC;
   }
 
+  // add childproc to the children array of its parent
+  spinlock_acquire(&curproc->p_lock);
+  array_add(curproc->childrenprocs, childproc, NULL);
+  childproc->parent = curproc;
+  spinlock_release(&curproc->p_lock);
+
   // create new address space, copy pages from old address space to newly created one (in newSpace)
   childproc->p_addrspace = as_create();
   int copy = as_copy(curproc_getas(), &(childproc->p_addrspace));
@@ -140,15 +146,8 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
     as_deactivate();
     proc_destroy(childproc);
     kfree(heaptf);
-    heaptf = NULL;
     return err_no;
   }
-
-  // add childproc to the children array of its parent
-  spinlock_acquire(&curproc->p_lock);
-  array_add(curproc->childrenprocs, childproc, NULL);
-  childproc->parent = curproc;
-  spinlock_release(&curproc->p_lock);
 
   *retval = childproc->pid;
   return 0;
