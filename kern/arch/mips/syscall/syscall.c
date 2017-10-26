@@ -187,7 +187,7 @@ void
 enter_forked_process(void *tf, unsigned long data2)
 {
 	data2 = 20;							// silence warning since we don't need this parameter
-	struct trapframe *localTrap = (struct trapframe *)tf;
+	struct trapframe *localTrap = tf;
 	localTrap->tf_a3 = 0;					// successful return
 	localTrap->tf_v0 = 0;					// no error because successful return
 	localTrap->tf_epc += 4;
