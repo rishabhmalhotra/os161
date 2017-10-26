@@ -96,24 +96,6 @@ proc_create(const char *name)
 		kfree(proc);
 		return NULL;
 	}
-	#if OPT_A2
-		
-		// keep track of children processes
-		proc->childrenprocs = array_create();
-		if (proc->childrenprocs == NULL) {
-			panic("couldn't create childrenprocs[]\n");
-		}
-
-		// init parent
-		proc->parent = NULL;
-
-		// set pid:
-		// P(pid_var_mutex);
-  		proc->pid = pid_var;
-  		pid_var++;
-  		// V(pid_var_mutex);
-
-	#endif
 
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);
@@ -342,6 +324,25 @@ proc_create_runprogram(const char *name)
 	P(proc_count_mutex); 
 	proc_count++;
 	V(proc_count_mutex);
+
+	#if OPT_A2
+		
+		// keep track of children processes
+		proc->childrenprocs = array_create();
+		if (proc->childrenprocs == NULL) {
+			panic("couldn't create childrenprocs[]\n");
+		}
+
+		// init parent
+		proc->parent = NULL;
+
+		// set pid:
+		P(pid_var_mutex);
+  		proc->pid = pid_var;
+  		pid_var++;
+  		V(pid_var_mutex);
+
+	#endif
 
 #endif // UW
 
