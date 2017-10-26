@@ -99,13 +99,13 @@ sys_waitpid(pid_t pid,
 
 void init_enter_forked_process(void *data1, unsigned long data2)
 {
-    struct trapframe *tf = (struct trapframe *)data1;
+    struct trapframe *tf = data1;
     (void) data2;
     enter_forked_process(tf, data2);
 }
 
 pid_t
-sys_fork(void *tf, pid_t *retval) {
+sys_fork(struct trapframe *tf, pid_t *retval) {
 
   KASSERT(curproc != NULL);
   KASSERT(curproc->p_addrspace != NULL);
@@ -134,15 +134,17 @@ sys_fork(void *tf, pid_t *retval) {
 
   // set pid of child
   spinlock_acquire(&childproc->p_lock);
+  P(pid_var_mutex);
   childproc->pid = pid_var;
   pid_var++;
+  V(pid_var_mutex);
   spinlock_release(&childproc->p_lock);
 
 
   // thread_fork() to create new thread:
   struct trapframe *heaptf = kmalloc(sizeof(*tf));                  // heaptf is (parent) tf on the heap
   memcpy(heaptf,tf, sizeof(*tf));
-  int err_no = thread_fork(curthread->t_name, childproc, &init_enter_forked_process, heaptf, 0);
+  int err_no = thread_fork(curthread->t_name, childproc, &init_enter_forked_process(tf, 0), heaptf, 0);
   if (err_no) {
     as_deactivate();
     proc_destroy(childproc);
