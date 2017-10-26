@@ -143,7 +143,7 @@ proc_destroy(struct proc *proc)
 
 	#if OPT_A2
 	// remove this proc from parent parent's children array
-	spinlock_acquire(&(proc->parent)->p_lock);
+	spinlock_acquire((proc->parent)->p_lock);
 	if (proc->parent != NULL) {
 		for (unsigned int i=0; i<array_num((proc->parent)->childrenprocs); i++) {
 			if (array_get(((proc->parent)->childrenprocs), i) == proc) {
