@@ -62,6 +62,7 @@ struct proc *kproc;
 #if OPT_A2
   volatile pid_t pid_var = 2;
   struct semaphore *pid_var_mutex;
+  struct semaphore *deletionHandler_mutex;
 #endif
 
 /*
@@ -145,8 +146,7 @@ proc_destroy(struct proc *proc)
 	#if OPT_A2
 	// KASSERT(proc->parent != NULL);
 	// remove this proc from parent parent's children array
-	// spinlock_acquire(&(proc->parent)->p_lock);
-	// put in some mutex
+	P(deletionHandler_mutex);
 	if (proc->parent) {
 		for (unsigned int i=0; i<array_num((proc->parent)->childrenprocs); i++) {
 			if (array_get(((proc->parent)->childrenprocs), i) == proc) {
@@ -155,7 +155,7 @@ proc_destroy(struct proc *proc)
 			}
 		}
 	}
-	// spinlock_release(&(proc->parent)->p_lock);
+	V(deletionHandler_mutex);
 	#endif // OPT_A2
 
 	/*
@@ -264,6 +264,10 @@ proc_bootstrap(void)
   pid_var_mutex = sem_create("pid_var_mutex", 1);
   if (pid_var_mutex == NULL) {
     panic("could not create pid_var_mutex semaphore\n");
+  }
+  deletionHandler_mutex = sem_create("deletionHandler_mutex", 1);
+  if (deletionHandler_mutex == NULL) {
+  	panic("could not create deletionHandler_mutex\n");
   }
 #endif		// OPT_A2
   // #if OPT_A2
