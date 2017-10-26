@@ -146,7 +146,7 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   struct trapframe *heaptf = kmalloc(sizeof(*tf));                  // heaptf is (parent) tf on the heap
   memcpy(heaptf,tf, sizeof(*tf));
   int err_no = thread_fork(curthread->t_name, childproc, &enter_forked_process, heaptf, 0);
-  if (err_no) {
+  if (err_no !=0) {
     as_deactivate();
     proc_destroy(childproc);
     kfree(heaptf);
