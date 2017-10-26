@@ -164,9 +164,7 @@ proc_destroy(struct proc *proc)
 	// if parent is not null, remove this process from its parent
 	if ((p != NULL) && (p->childrenprocs != NULL)) {
 		for (unsigned int i=0; i<array_num(p->childrenprocs); i++) {
-			kprintf("hello\n");
 			if (array_get((p->childrenprocs), i) == proc) {
-				kprintf("hello1\n");
 				array_remove((p->childrenprocs), i);
 				break;
 			}
