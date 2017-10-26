@@ -145,6 +145,7 @@ proc_destroy(struct proc *proc)
 
 	#if OPT_A2
 	// KASSERT(proc->parent != NULL);
+	proc->childrenprocs = NULL;
 	// remove this proc from parent parent's children array
 	P(deletionHandler_mutex);
 	if (proc->parent) {
