@@ -49,6 +49,7 @@ struct semaphore;
 
 #if OPT_A2
 extern volatile pid_t pid_var;
+extern struct semaphore *pid_var_mutex;
 #endif
 
 /*
