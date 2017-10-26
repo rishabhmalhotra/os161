@@ -61,11 +61,8 @@ struct proc *kproc;
 
 #if OPT_A2
   volatile pid_t pid_var = 2;
+  static struct semaphore *pid_var_mutex;
 #endif
-// #if OPT_A2
-	// global array of (proc pointers) indexed from 2 for keeping track of pids
-	// struct array *procedures;
-// #endif
 
 /*
  * Mechanism for making the kernel menu thread sleep while processes are running
@@ -261,6 +258,10 @@ proc_bootstrap(void)
 
 #if OPT_A2
   pid_var = 2;
+  pid_var_mutex = sem_create("pid_var_mutex", 1);
+  if (pid_var_mutex == NULL) {
+    panic("could not create pid_var_mutex semaphore\n");
+  }
 #endif		// OPT_A2
   // #if OPT_A2
   // 	// init procedures[]
