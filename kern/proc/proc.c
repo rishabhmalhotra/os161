@@ -78,10 +78,6 @@ static struct semaphore *proc_count_mutex;
 struct semaphore *no_proc_sem;   
 #endif  // UW
 
-// // add NULL pointers to indices 0,1 so that proc addressing starts from index 2
-// array_add(procedures, NULL, NULL);
-// array_add(procedures, NULL, NULL);
-
 /*
  * Create a proc structure.
  */
@@ -226,19 +222,6 @@ proc_destroy(struct proc *proc)
 	P(proc_count_mutex); 
 	KASSERT(proc_count > 0);
 
-	// #if OPT_A2
-	// 	KASSERT(procedures != NULL);
-
-	// 	for (unsigned int i=0; i<array_num(procedures); i++) {
-	// 		if (array_get(procedures, i) == proc) {
-	// 			// set to NULL, don't remove because it'll slide following entries back
-	// 			array_set(procedures, i, NULL);
-	// 			break;
-	// 		}
-	// 	}
-
-	// #endif		// OPT_A2
-
 	kfree(proc->p_name);
 	kfree(proc);
 
@@ -285,13 +268,7 @@ proc_bootstrap(void)
   	panic("could not create deletionHandler_mutex\n");
   }
 #endif		// OPT_A2
-  // #if OPT_A2
-  // 	// init procedures[]
-  // 	procedures = array_create();
-  // 	if (procedures == NULL) {
-  // 		panic("could not create array procedures\n");
-  // 	}
-  // #endif	// OPT_A2
+
 #endif // UW 
 }
 
@@ -354,24 +331,6 @@ proc_create_runprogram(const char *name)
 	P(proc_count_mutex); 
 	proc_count++;
 	V(proc_count_mutex);
-
-	// whenever a process is created, it is added to procedures & the array index is it's PID, removal in proc_destroy()
-	// #if OPT_A2
-		// // add newly created proc to array and implement reusability
-		// if ((array_get(procedures, array_num(procedures)-1)) == 32767) {					// __PID_MAX = 32767
-		// 	for (unsigned int i=0; i<array_num(procedures); i++) {
-		// 		if ((array_get(procedures, i) == NULL) && ((i != 0) || (i != 1))) {			// case when prev proc has been removed
-		// 			array_set(procedures, i, proc);
-		// 			// set pid for proc
-		// 			proc->pid = (pid_t)i;
-		// 			break;
-		// 		}
-		// 	}
-		// } else {
-		// 	array_add(procedures, proc, NULL);
-		// }
-
-	// #endif	// OPT_A2
 
 #endif // UW
 
