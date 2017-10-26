@@ -59,7 +59,7 @@ sys_getpid(pid_t *retval)
 {
   /* for now, this is just a stub that always returns a PID of 1 */
   /* you need to fix this to make it work properly */
-  *retval = 1;
+  *retval = curproc->pid;
   return(0);
 }
 
@@ -97,13 +97,6 @@ sys_waitpid(pid_t pid,
 }
 
 #if OPT_A2
-
-void init_enter_forked_process(void *data1, unsigned long data2)
-{
-    struct trapframe *tf = data1;
-    (void) data2;
-    enter_forked_process(tf, data2);
-}
 
 pid_t
 sys_fork(struct trapframe *tf, pid_t *retval) {
