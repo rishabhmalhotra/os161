@@ -148,7 +148,7 @@ proc_destroy(struct proc *proc)
 	proc->childrenprocs = NULL;
 	// remove this proc from parent parent's children array
 	P(deletionHandler_mutex);
-	if ((proc->parent)->childrenprocs) {
+	if ((proc->parent) && ((proc->parent)->childrenprocs)) {
 		for (unsigned int i=0; i<array_num((proc->parent)->childrenprocs); i++) {
 			if (array_get(((proc->parent)->childrenprocs), i) == proc) {
 				array_remove(((proc->parent)->childrenprocs), i);
