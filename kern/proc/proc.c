@@ -108,10 +108,10 @@ proc_create(const char *name)
 		proc->parent = NULL;
 
 		// set pid:
-		P(pid_var_mutex);
+		// P(pid_var_mutex);
   		proc->pid = pid_var;
   		pid_var++;
-  		V(pid_var_mutex);
+  		// V(pid_var_mutex);
 
 	#endif
 
