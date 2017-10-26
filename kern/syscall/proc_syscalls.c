@@ -113,9 +113,8 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   }
 
   // create new address space, copy pages from old address space to newly created one (in newSpace)
-  int copy;
   childproc->p_addrspace = as_create();
-  copy = as_copy(curproc_getas(), &(childproc->p_addrspace));
+  int copy = as_copy(curproc_getas(), &(childproc->p_addrspace));
   
   // either as_copy() failed or no addrspace of childproc:
   if ((copy != 0) || (childproc->p_addrspace == NULL)) {
@@ -143,13 +142,13 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
     as_deactivate();
     proc_destroy(childproc);
     kfree(heaptf);
-    // heaptf = NULL;
+    heaptf = NULL;
     return err_no;
   }
 
   // add childproc to the children array of its parent
   //spinlock_acquire(&curproc->p_lock);
-  array_add(curproc->childrenprocs, childproc, NULL);
+  array_add(&curproc->childrenprocs, childproc, NULL);
   childproc->parent = curproc;
   //spinlock_release(&curproc->p_lock);
 
