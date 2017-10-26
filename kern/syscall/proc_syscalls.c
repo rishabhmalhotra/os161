@@ -128,13 +128,6 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENOMEM;
   }
 
-  // set pid of child
-  P(pid_var_mutex);
-  childproc->pid = pid_var;
-  pid_var++;
-  V(pid_var_mutex);
-
-
   // thread_fork() to create new thread:
   struct trapframe *heaptf = kmalloc(sizeof(*tf));                  // heaptf is (parent) tf on the heap
   memcpy(heaptf,tf, sizeof(*tf));
