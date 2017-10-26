@@ -145,7 +145,7 @@ proc_destroy(struct proc *proc)
 	// remove this proc from parent parent's children array
 	// spinlock_acquire(&(proc->parent)->p_lock);
 	// put in some mutex
-	if ((proc->parent != NULL) && (proc->parent != 0xDEADBEEF)) {
+	if (proc->parent) {
 		for (unsigned int i=0; i<array_num((proc->parent)->childrenprocs); i++) {
 			if (array_get(((proc->parent)->childrenprocs), i) == proc) {
 				array_remove(((proc->parent)->childrenprocs), i);
