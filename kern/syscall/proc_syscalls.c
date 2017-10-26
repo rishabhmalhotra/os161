@@ -134,6 +134,7 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   // set pid of child
   P(pid_var_mutex);
   childproc->pid = pid_var;
+  kprintf("PID assigned: %d", childproc->pid);
   pid_var++;
   V(pid_var_mutex);
 
