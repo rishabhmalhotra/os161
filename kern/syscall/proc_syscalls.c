@@ -141,8 +141,8 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   if (err_no !=0) {
     as_deactivate();
     // proc_destroy(childproc);
-    kfree(heaptf);
-    heaptf = NULL;
+    // kfree(heaptf);
+    // heaptf = NULL;
     return err_no;
   }
 
