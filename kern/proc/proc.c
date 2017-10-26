@@ -149,7 +149,7 @@ proc_destroy(struct proc *proc)
 
 	// remove all pointers to the parent(this process) from its children:
 	for (unsigned int i=0; i<array_num(proc->childrenprocs); i++) {
-		(proc->childrenprocs[i]).parent = NULL;
+		 array_get(proc->childrenprocs, i)->parent = NULL;	//(proc->childrenprocs[i]).parent = NULL;
 	}
 	proc->childrenprocs = NULL;
 
