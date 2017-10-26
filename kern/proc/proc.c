@@ -144,12 +144,24 @@ proc_destroy(struct proc *proc)
 	KASSERT(proc != kproc);
 
 	#if OPT_A2
-	// KASSERT(proc->parent != NULL);
-	proc->childrenprocs = NULL;
-	// remove this proc from parent parent's children array
+
 	P(deletionHandler_mutex);
+
+	// remove all pointers to the parent(this process) from its children:
+	for (unsigned int i=0; i<array_num(proc->childrenprocs); i++) {
+		proc->childrenprocs[i]->parent = NULL;
+	}
+	proc->childrenprocs = NULL;
+	
+	V(deletionHandler_mutex);
+
+	P(deletionHandler_mutex);
+
+	// remove this proc from parent parent's children array
 	struct proc *p = proc->parent;
-	if ((p != NULL)  && (p->childrenprocs != NULL)) {
+
+	// if parent is not null, remove this process from its parent
+	if ((p != NULL) && (p->childrenprocs != NULL)) {
 		for (unsigned int i=0; i<array_num(p->childrenprocs); i++) {
 			kprintf("hello\n");
 			if (array_get((p->childrenprocs), i) == proc) {
