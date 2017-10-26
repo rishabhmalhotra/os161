@@ -60,7 +60,7 @@
 struct proc *kproc;
 
 #if OPT_A2
-  volatile pid_t pid_var = 2;
+  volatile pid_t pid_var;
   struct semaphore *pid_var_mutex;
   struct semaphore *deletionHandler_mutex;
 #endif
@@ -97,11 +97,22 @@ proc_create(const char *name)
 		return NULL;
 	}
 	#if OPT_A2
+		
+		// keep track of children processes
 		proc->childrenprocs = array_create();
 		if (proc->childrenprocs == NULL) {
 			panic("couldn't create childrenprocs[]\n");
 		}
+
+		// init parent
 		proc->parent = NULL;
+
+		// set pid:
+		P(pid_var_mutex);
+  		proc->pid = pid_var;
+  		pid_var++;
+  		V(pid_var_mutex);
+
 	#endif
 
 	threadarray_init(&proc->p_threads);
