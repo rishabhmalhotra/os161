@@ -184,8 +184,6 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
     }
   }
 
-  procTable->parentPid = curproc->pid; // This means that procTable is the child in sys_fork() of curproc, hence set its parent pid
-
 
   // add childproc to the children array of its parent
   spinlock_acquire(&curproc->p_lock);
