@@ -68,6 +68,9 @@ void sys__exit(int exitcode) {
   // this proc/thread is gone so let parent know we're done!!
   cv_broadcast(p->w8Cv, p->w8Lock);
 
+  lock_acquire(p->exitLock);
+  lock_release(p->exitLock);
+
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
   proc_destroy(p);  // this will also set all kids parent to NULL as well as set isProcAlive to false
