@@ -65,6 +65,7 @@ struct proc *kproc;
   struct semaphore *deletionHandler_mutex;
   // alive process:
   struct array *aliveProcs;
+  struct array *allProcs;
 #endif
 
 /*
@@ -278,6 +279,18 @@ proc_bootstrap(void)
   if (aliveProcs == NULL) {
   	panic("could not create aliveProcs\n");
   }
+  allProcs = array_create();
+  if (allProcs == NULL) {
+  	panic("could not create allProcs\n");
+  }
+  procTableLock = lock_create("procTableLock");
+  if (procTableLock == NULL)  {
+  	panic("couldn't create procTableLock");
+  }
+  procTableW8Cv = cv_create("procTableW8Cv");
+  if (procTableW8Cv == NULL) {
+  	panic("couldn't create procTableW8Cv");
+  }
 #endif		// OPT_A2
 
 #endif // UW 
@@ -366,30 +379,17 @@ proc_create_runprogram(const char *name)
   		pid_var++;
   		V(pid_var_mutex);
 
-  		// init all (lock and CV)'s:
-  		proc->exitLock = lock_create("proc exitLock");
-  		if (proc->exitLock == NULL) {
-			kfree(proc->p_name);
-			kfree(proc);
-			return NULL;
-   		}
+  		// procTable:
 
-  		proc->w8Lock = lock_create("proc w8Lock");
-  		if (proc->w8Lock == NULL) {
-			lock_destroy(proc->w8Lock);
-			kfree(proc->p_name);
-			kfree(proc);
-			return NULL;
-   		}
+  		struct procTable *procTable = kmalloc(sizeof(struct procTable));
+  		procTable->pid = proc->pid;
+  		procTable->state = PROC_RUNNING;
+  		procTable->parentPid = PROC_NO_PID;
+		procTable->exitCode = 0;
 
-  		proc->w8Cv = cv_create("proc w8Cv");
-  		if (proc->exitLock == NULL) {
-			lock_destroy(proc->w8Lock);
-			lock_destroy(proc->w8Lock);
-			kfree(proc->p_name);
-			kfree(proc);
-			return NULL;
-   		}
+		lock_acquire(procTableLock);
+		array_add(allProcs, procTable, NULL);
+		lock_release(procTableLock);
 	#endif
 
 #endif // UW
