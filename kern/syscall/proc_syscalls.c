@@ -21,8 +21,13 @@ void sys__exit(int exitcode) {
 
   struct addrspace *as;
   struct proc *p = curproc;
+  /* for now, just include this to keep the compiler from complaining about
+     an unused variable */
+  (void)exitcode;
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
+
+  KASSERT(curproc->p_addrspace != NULL);
 
   lock_acquire(procTableLock);
   struct procTable *procTable = NULL;
@@ -103,7 +108,7 @@ sys_waitpid(pid_t pid,
 	    pid_t *retval)
 {
   int exitstatus;
-  int result = 0;
+  int result = 0;                             // for program name unknown: waitpid 1 errors
 
   struct procTable *procTable1;
 
@@ -156,7 +161,7 @@ sys_waitpid(pid_t pid,
     return(result);
   }
   *retval = pid;
-  return 0;
+  return(0);
 }
 
 #if OPT_A2
