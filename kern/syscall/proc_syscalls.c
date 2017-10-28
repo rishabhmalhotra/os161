@@ -139,7 +139,6 @@ sys_waitpid(pid_t pid,
   // keep w8ing on proc while its alive before returning (sort of block its thread):
   lock_acquire(p->w8Lock);
   while (p->isProcAlive) {
-    kprintf("hello\n");
     cv_wait(p->w8Cv, p->w8Lock);
   }
   lock_release(p->w8Lock);
