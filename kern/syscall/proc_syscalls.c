@@ -17,7 +17,7 @@
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
 
-void sys__exit(int exitcode, bool canExit) {
+void sys__exit(int exitcode) {
 
   struct addrspace *as;
   struct proc *p = curproc;
@@ -40,11 +40,7 @@ void sys__exit(int exitcode, bool canExit) {
 
   if (procTable->parentPid != NoPidForProc) {
     procTable->state = ZombieProc;
-    if(canExit){
-     procTable->exitCode = _MKWAIT_EXIT(exitcode);  
-    } else {
-      procTable->exitCode = _MKWAIT_SIG(exitcode);
-    }
+    procTable->exitCode = _MKWAIT_EXIT(exitcode);  
     cv_broadcast(procTableW8Cv, procTableLock);
   } else {
     procTable->state = ProcExited;
@@ -110,11 +106,9 @@ sys_waitpid(pid_t pid,
   int result;
 
   lock_acquire(procTable);
-  // which process calling waitpid (for supplied PID):
-  struct procTable *procTable;
 
   for (unsigned int i=0; i<array_num(allProcs); i++) {
-    procTable = array_get(allProcs, i);
+    struct procTable *procTable = array_get(allProcs, i);
     if (procTable->pid == pid) {
       break;
     } else {
