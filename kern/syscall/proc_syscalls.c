@@ -188,7 +188,7 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   int copy = as_copy(curproc_getas(), &(childproc->p_addrspace));
   
   // either as_copy() failed or no addrspace of childproc:
-  if ((copy != 0) || (childproc->p_addrspace == NULL)) {
+  if (childproc->p_addrspace == NULL) {
     proc_destroy(childproc);
     return ENOMEM;
   }
