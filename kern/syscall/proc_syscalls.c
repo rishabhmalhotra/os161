@@ -60,20 +60,7 @@ void sys__exit(int exitcode, bool canExit) {
 
   lock_release(procTableLock);
 
-  // all kids of this proc need their parent pointers updated & release their 
-  // locks (which we acquired at the end of sys_fork() remember? :) )
-
-  for (unsigned int i=0; i<array_num(p->childrenprocs); i++) {
-    struct proc *childproc = array_get(p->childrenprocs, i);
-
-    // remove child from childrenprocs of p:
-    array_remove(p->childrenprocs, i);
-  }
-
   as_deactivate();
-
-  // all children from children array should be gone (parent pointers being set to NULL in my proc_destroy)
-  KASSERT(array_num(p->childrenprocs) == 0);
   
   /*
    * clear p_addrspace before calling as_destroy. Otherwise if
@@ -124,7 +111,7 @@ sys_waitpid(pid_t pid,
 
   lock_acquire(procTable);
   // which process calling waitpid (for supplied PID):
-  struct procTable *procTable = NULL;
+  struct procTable *procTable;
 
   for (unsigned int i=0; i<array_num(allProcs); i++) {
     procTable = array_get(allProcs, i);
