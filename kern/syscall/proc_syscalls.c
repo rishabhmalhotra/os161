@@ -103,7 +103,7 @@ sys_waitpid(pid_t pid,
 	    pid_t *retval)
 {
   int exitstatus;
-  int result;
+  int result = 0;
 
   struct procTable *procTable1;
 
@@ -119,15 +119,13 @@ sys_waitpid(pid_t pid,
   }
 
   if (procTable1 == NULL) {
-    lock_release(procTableLock);
-    return ESRCH;
+    result = ESRCH;
   }
 
   struct proc *parentProc = curproc;
 
   if (parentProc->pid != procTable1->pid) {
-    lock_release(procTableLock);
-    return ECHILD;
+    result = ECHILD;
   }
 
   if (options != 0) {
