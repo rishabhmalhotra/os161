@@ -201,7 +201,7 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   }
 
   // acquire lock on child so it can't exit before parent (eliminate the zombie case):
-  lock_acquire(childproc->exitLock);
+  // lock_acquire(childproc->exitLock);
 
   *retval = childproc->pid;
   return 0;
