@@ -195,6 +195,10 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // thread_fork() to create new thread:
   struct trapframe *heaptf = kmalloc(sizeof(*tf));                  // heaptf is (parent) tf on the heap
+  if (heaptf == NULL) {
+    proc_destroy(childProc);
+    return ENOMEM;
+  }
   memcpy(heaptf,tf, sizeof(*tf));
   int err_no = thread_fork(curthread->t_name, childproc, &enter_forked_process, heaptf, 0);
   if (err_no !=0) {
