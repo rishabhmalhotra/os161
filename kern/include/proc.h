@@ -64,8 +64,8 @@ struct procTable {
 	int state;							/* zombie, orphan,.... */
     int exitCode;
 };
- struct lock *procTableLock;
- struct cv *procTableW8Cv;
+struct lock *procTableLock;
+struct cv *procTableW8Cv;
 
 #endif
 
