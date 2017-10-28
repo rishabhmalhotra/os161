@@ -274,7 +274,7 @@ proc_bootstrap(void)
   if (deletionHandler_mutex == NULL) {
   	panic("could not create deletionHandler_mutex\n");
   }
-  array_init(aliveProcs);
+  aliveProcs = array_create();
   if (aliveProcs == NULL) {
   	panic("could not create aliveProcs\n");
   }
