@@ -108,9 +108,9 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result = 0;                             // for program name unknown: waitpid 1 errors
 
-  struct procTable *procTable1;
-
   lock_acquire(procTableLock);
+
+  struct procTable *procTable1;
 
   for (unsigned int i=0; i<array_num(allProcs); i++) {
     procTable1 = array_get(allProcs, i);
@@ -139,9 +139,6 @@ sys_waitpid(pid_t pid,
   }
 
   if (options != 0) {
-    if (lock_do_i_hold(procTableLock)) {
-      lock_release(procTableLock);
-    }
     return(EINVAL);
   }
 
