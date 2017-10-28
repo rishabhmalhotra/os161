@@ -144,7 +144,6 @@ sys_waitpid(pid_t pid,
   /* exitstatus is the procExitStatus */
   exitstatus = procTable1->exitCode;
   lock_release(procTableLock);
-  exitstatus = 0;
   result = copyout((void *)&exitstatus,status,sizeof(int));
   
   if (result) {
