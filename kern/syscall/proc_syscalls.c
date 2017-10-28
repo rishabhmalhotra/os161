@@ -44,10 +44,11 @@ void sys__exit(int exitcode) {
   if (procTable->parentPid != NoPidForProc) {
     procTable->state = ZombieProc;
     procTable->exitCode = _MKWAIT_EXIT(exitcode);  
-    cv_broadcast(procTableW8Cv, procTableLock);
+    // cv_broadcast(procTableW8Cv, procTableLock);
   } else {
     procTable->state = ProcExited;
   }
+  cv_broadcast(procTableW8Cv, procTableLock);
 
   for (unsigned int i = 0; i < array_num(allProcs); i++) {
     struct procTable *curProcTable = array_get(allProcs,i);
