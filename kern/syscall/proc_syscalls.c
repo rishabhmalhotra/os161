@@ -62,7 +62,7 @@ void sys__exit(int exitcode) {
   proc_remthread(curthread);
 
   // set exitcode
-  ->isProcAlive = false;  // remove from proc_destroy
+  p->isProcAlive = false;  // remove from proc_destroy
   p->procExitStatus = _MKWAIT_EXIT(exitcode);
 
   // this proc/thread is gone so let parent know we're done!!
@@ -131,7 +131,7 @@ sys_waitpid(pid_t pid,
   }
 
   // curproc needs to be child, can't w8 on it's own self
-  if (p = curproc) {
+  if (p == curproc) {
     *retval = -1;
     return ECHILD;
   }
