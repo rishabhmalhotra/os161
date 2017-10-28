@@ -152,7 +152,9 @@ sys_waitpid(pid_t pid,
   exitstatus = procTable1->exitCode;
   lock_release(procTableLock);
   result = copyout((void *)&exitstatus,status,sizeof(int));
-  
+  if (result) {
+    return(result);
+  }
   *retval = pid;
   return 0;
 }
