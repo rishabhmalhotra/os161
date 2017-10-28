@@ -21,9 +21,6 @@ void sys__exit(int exitcode) {
 
   struct addrspace *as;
   struct proc *p = curproc;
-  /* for now, just include this to keep the compiler from complaining about
-     an unused variable */
-  (void)exitcode;
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
@@ -77,7 +74,7 @@ void sys__exit(int exitcode) {
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
 
-  p->isProcAlive = false;  // remove from proc_destroy
+  p->isProcAlive = false;
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
@@ -129,7 +126,7 @@ sys_waitpid(pid_t pid,
 
   struct proc *parentProc = curproc;
 
-  if (parentProc->pid != procTable1->pid) {
+  if (parentProc->pid != procTable1->parentPid) {
     result = ECHILD;
   }
 
