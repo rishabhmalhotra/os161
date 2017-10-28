@@ -42,6 +42,11 @@
 #include <synch.h>
 #include "opt-A2.h"
 
+#define ProcExited 0
+#define ActiveProc 1
+#define NoPidForProc -1
+#define ZombieProc 2
+
 struct addrspace;
 struct vnode;
 #ifdef UW
