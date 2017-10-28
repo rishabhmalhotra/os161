@@ -278,6 +278,29 @@ proc_bootstrap(void)
   if (aliveProcs == NULL) {
   	panic("could not create aliveProcs\n");
   }
+  // init all (lock and CV)'s:
+  proc->exitLock = lock_create("proc ExitLock");
+  if (proc->exitLock == NULL) {
+	kfree(proc->p_name);
+	kfree(proc);
+	return NULL;
+   }
+  proc->w8Lock = lock_create("proc w8Lock");
+  if (proc->w8Lock == NULL) {
+	lock_destroy(proc->w8Lock);
+	kfree(proc->p_name);
+	kfree(proc);
+	return NULL;
+   }
+
+  proc->w8Cv = cv_create("proc w8Cv");
+  if (proc->exitLock == NULL) {
+	lock_destroy(proc->w8Lock);
+	lock_destroy(proc->w8Lock);
+	kfree(proc->p_name);
+	kfree(proc);
+	return NULL;
+   }
 #endif		// OPT_A2
 
 #endif // UW 
@@ -358,6 +381,8 @@ proc_create_runprogram(const char *name)
 
 		// init parent
 		proc->parent = NULL;
+
+		proc->procExitStatus = 0;
 
 		// set pid:
 		P(pid_var_mutex);
