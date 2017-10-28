@@ -349,6 +349,7 @@ proc_create_runprogram(const char *name)
 		array_add(aliveProcs, proc, NULL);
 
 		proc->isProcAlive = true;
+		proc->procExitStatus = 0;
 
 		// keep track of children processes
 		proc->childrenprocs = array_create();
@@ -359,8 +360,6 @@ proc_create_runprogram(const char *name)
 		// init parent
 		proc->parent = NULL;
 
-		proc->procExitStatus = 0;
-
 		// set pid:
 		P(pid_var_mutex);
   		proc->pid = pid_var;
@@ -368,12 +367,13 @@ proc_create_runprogram(const char *name)
   		V(pid_var_mutex);
 
   		// init all (lock and CV)'s:
-  		proc->exitLock = lock_create("proc ExitLock");
+  		proc->exitLock = lock_create("proc exitLock");
   		if (proc->exitLock == NULL) {
 			kfree(proc->p_name);
 			kfree(proc);
 			return NULL;
    		}
+
   		proc->w8Lock = lock_create("proc w8Lock");
   		if (proc->w8Lock == NULL) {
 			lock_destroy(proc->w8Lock);
