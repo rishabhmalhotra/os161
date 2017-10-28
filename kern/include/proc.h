@@ -54,11 +54,11 @@ extern struct semaphore *pid_var_mutex;
 extern struct array *aliveProcs;		/* for procs */
 extern struct array *allProcs;			/* for procTable */
 extern struct procTable {
-			pid_t pid;
-			pid_t parentPid;
-			int state;					/* zombie, orphan,.... */
-    		int exitCode;
-		};
+	pid_t pid;
+	pid_t parentPid;
+	int state;							/* zombie, orphan,.... */
+    int exitCode;
+};
 extern struct lock *procTableLock;
 extern struct cv *procTableW8Cv;
 
