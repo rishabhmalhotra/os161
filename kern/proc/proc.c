@@ -380,6 +380,7 @@ proc_create_runprogram(const char *name)
   		V(pid_var_mutex);
 
   		// procTable:
+  		lock_acquire(procTableLock);
 
   		struct procTable *procTable = kmalloc(sizeof(struct procTable));
   		procTable->pid = proc->pid;
@@ -387,7 +388,6 @@ proc_create_runprogram(const char *name)
   		procTable->parentPid = NoPidForProc;
 		procTable->exitCode = 0;
 
-		lock_acquire(procTableLock);
 		array_add(allProcs, procTable, NULL);
 		lock_release(procTableLock);
 	#endif
