@@ -105,18 +105,20 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result;
 
+  struct procTable *procTable1;
+
   lock_acquire(procTableLock);
 
   for (unsigned int i=0; i<array_num(allProcs); i++) {
-    struct procTable *procTable = array_get(allProcs, i);
-    if (procTable->pid == pid) {
+    procTable1 = array_get(allProcs, i);
+    if (procTable1->pid == pid) {
       break;
     } else {
-      procTable = NULL;
+      procTable1 = NULL;
     }
   }
 
-  if (procTable == NULL) {
+  if (procTable1 == NULL) {
     lock_release(procTableLock);
     return ESRCH;
   }
@@ -132,7 +134,7 @@ sys_waitpid(pid_t pid,
     }
   }
 
-  if (parentProc->pid != procTable->pid) {
+  if (parentProc->pid != procTable1->pid) {
     *retval = -1;
     lock_release(procTableLock);
     return ECHILD;
@@ -146,13 +148,13 @@ sys_waitpid(pid_t pid,
   }
 
   // wait to finish
-  while (procTable->state == ActiveProc) {
+  while (procTable1->state == ActiveProc) {
     cv_wait(procTableW8Cv, procTableLock);
   }
 
 
   /* exitstatus is the procExitStatus */
-  exitstatus = procTable->exitCode;
+  exitstatus = procTable1->exitCode;
   lock_release(procTableLock);
   exitstatus = 0;
   result = copyout((void *)&exitstatus,status,sizeof(int));
