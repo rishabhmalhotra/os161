@@ -185,7 +185,7 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // create new address space, copy pages from old address space to newly created one (in newSpace)
   childproc->p_addrspace = as_create();
-  int copy = as_copy(curproc_getas(), &(childproc->p_addrspace));
+  as_copy(curproc_getas(), &(childproc->p_addrspace));
   
   // either as_copy() failed or no addrspace of childproc:
   if (childproc->p_addrspace == NULL) {
