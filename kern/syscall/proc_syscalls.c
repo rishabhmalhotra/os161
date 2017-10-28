@@ -134,7 +134,7 @@ sys_waitpid(pid_t pid,
   }
   lock_release(p->w8Lock);
 
-  /* for now, just pretend the exitstatus is 0 --> it is the procExitStatus */
+  /* exitstatus is the procExitStatus */
   exitstatus = p->procExitStatus;
   exitstatus = 0;
   result = copyout((void *)&exitstatus,status,sizeof(int));
@@ -142,7 +142,7 @@ sys_waitpid(pid_t pid,
     return(result);
   }
   *retval = pid;
-  return(0);
+  return 0;
 }
 
 #if OPT_A2
