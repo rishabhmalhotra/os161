@@ -59,6 +59,7 @@ extern struct procTable {
 	int state;							/* zombie, orphan,.... */
     int exitCode;
 };
+procTable *makeWarningGoAway;
 extern struct lock *procTableLock;
 extern struct cv *procTableW8Cv;
 
