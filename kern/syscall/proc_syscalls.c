@@ -128,6 +128,13 @@ sys_waitpid(pid_t pid,
     result = ECHILD;
   }
 
+  if (result) {
+    if (lock_do_i_hold(procTableLock)) {
+      lock_release(procTableLock);
+    }
+    return(result);
+  }
+
   if (options != 0) {
     if (lock_do_i_hold(procTableLock)) {
       lock_release(procTableLock);
@@ -146,12 +153,6 @@ sys_waitpid(pid_t pid,
   lock_release(procTableLock);
   result = copyout((void *)&exitstatus,status,sizeof(int));
   
-  if (result) {
-    if (lock_do_i_hold(procTableLock)) {
-      lock_release(procTableLock);
-    }
-    return(result);
-  }
   *retval = pid;
   return 0;
 }
