@@ -128,10 +128,10 @@ sys_waitpid(pid_t pid,
   //   return ESRCH;
   // }
 
-  // if (options != 0) {
-  //   *retval = -1;
-  //   return(EINVAL);
-  // }
+  if (options != 0) {
+    *retval = -1;
+    return(EINVAL);
+  }
 
   // // curproc needs to be child, can't w8 on it's own self
   // if (p == curproc) {
