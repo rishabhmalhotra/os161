@@ -124,15 +124,6 @@ sys_waitpid(pid_t pid,
   }
 
   struct proc *parentProc = curproc;
-  // check all currently alive processes to see if a proc with this PID exists:
-  for (unsigned int i=0; i<array_num(aliveProcs); i++) {
-    struct proc *cur = array_get(aliveProcs, i);
-    if (cur != NULL) {
-      if (cur->pid == pid) {
-        p = cur;
-      }
-    }
-  }
 
   if (parentProc->pid != procTable1->pid) {
     *retval = -1;
