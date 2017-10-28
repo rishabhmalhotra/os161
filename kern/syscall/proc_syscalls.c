@@ -126,7 +126,6 @@ sys_waitpid(pid_t pid,
   struct proc *parentProc = curproc;
 
   if (parentProc->pid != procTable1->pid) {
-    *retval = -1;
     lock_release(procTableLock);
     return ECHILD;
   }
