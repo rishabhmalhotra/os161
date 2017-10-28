@@ -38,8 +38,8 @@ void sys__exit(int exitcode, bool canExit) {
 
   KASSERT(procTable != NULL);
 
-  if (procTable->parentPid != PROC_NO_PID) {
-    procTable->state = PROC_ZOMBIE;
+  if (procTable->parentPid != NoPidForProc) {
+    procTable->state = ZombieProc;
     if(canExit){
      procTable->exitCode = _MKWAIT_EXIT(exitcode);  
     } else {
@@ -47,14 +47,14 @@ void sys__exit(int exitcode, bool canExit) {
     }
     cv_broadcast(procTableW8Cv, procTableLock);
   } else {
-    procTable->state = PROC_EXITED;
+    procTable->state = ProcExited;
   }
 
   for (unsigned int i = 0; i < array_num(allProcs); i++) {
     struct procTable *curProcTable = array_get(allProcs,i);
-    if((curProcTable->parentPid == procTable->pid) && (curProcTable->state == PROC_ZOMBIE)) {
-      curProcTable->state = PROC_EXITED;
-      curProcTable->parentPid = PROC_NO_PID;
+    if((curProcTable->parentPid == procTable->pid) && (curProcTable->state == ZombieProc)) {
+      curProcTable->state = ProcExited;
+      curProcTable->parentPid = NoPidForProc;
     }
   }
 
@@ -165,7 +165,7 @@ sys_waitpid(pid_t pid,
   }
 
   // wait to finish
-  while (procTable->state == PROC_RUNNING) {
+  while (procTable->state == ActiveProc) {
     cv_wait(procTableW8Cv, procTableLock);
   }
 
