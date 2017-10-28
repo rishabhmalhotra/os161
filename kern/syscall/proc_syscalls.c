@@ -16,6 +16,7 @@
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
+#if OPT_A2
 
 void sys__exit(int exitcode) {
 
@@ -161,7 +162,6 @@ sys_waitpid(pid_t pid,
   return(0);
 }
 
-#if OPT_A2
 
 pid_t
 sys_fork(struct trapframe *tf, pid_t *retval) {
@@ -195,10 +195,6 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // thread_fork() to create new thread:
   struct trapframe *heaptf = kmalloc(sizeof(*tf));                  // heaptf is (parent) tf on the heap
-  if (heaptf == NULL) {
-    proc_destroy(childProc);
-    return ENOMEM;
-  }
   memcpy(heaptf,tf, sizeof(*tf));
   int err_no = thread_fork(curthread->t_name, childproc, &enter_forked_process, heaptf, 0);
   if (err_no !=0) {
