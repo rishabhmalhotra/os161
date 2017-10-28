@@ -105,7 +105,7 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result;
 
-  lock_acquire(procTable);
+  lock_acquire(procTableLock);
 
   for (unsigned int i=0; i<array_num(allProcs); i++) {
     struct procTable *procTable = array_get(allProcs, i);
