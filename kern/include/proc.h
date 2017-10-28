@@ -53,13 +53,12 @@ extern volatile pid_t pid_var;
 extern struct semaphore *pid_var_mutex;
 extern struct array *aliveProcs;		/* for procs */
 extern struct array *allProcs;			/* for procTable */
-extern struct procTable {
+struct procTable {
 	pid_t pid;
 	pid_t parentPid;
 	int state;							/* zombie, orphan,.... */
     int exitCode;
 };
-procTable *makeWarningGoAway;
 extern struct lock *procTableLock;
 extern struct cv *procTableW8Cv;
 
