@@ -339,9 +339,9 @@ proc_create_runprogram(const char *name)
 	/* increment the count of processes */
         /* we are assuming that all procs, including those created by fork(),
            are created using a call to proc_create_runprogram  */
-	//P(proc_count_mutex); 
+	P(proc_count_mutex); 
 	proc_count++;
-	//V(proc_count_mutex);
+	V(proc_count_mutex);
 
 	#if OPT_A2
 		// add to aliveProcs first:
