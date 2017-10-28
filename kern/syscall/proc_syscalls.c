@@ -17,23 +17,54 @@
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
 
-void sys__exit(int exitcode) {
+void sys__exit(int exitcode, bool canExit) {
 
   struct addrspace *as;
   struct proc *p = curproc;
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
-  KASSERT(curproc->p_addrspace != NULL);
+  lock_acquire(procTableLock);
+  struct procTable *procTable = NULL;
+
+  for (unsigned int i=0; i<array_num(allProcs); i++) {
+    procTable = array_get(allProcs, i);
+    if (procTable->pid == curproc->pid) {
+      break;
+    } else {
+      procTable = NULL;
+    }
+  }
+
+  KASSERT(procTable != NULL);
+
+  if (procTable->parentPid != PROC_NO_PID) {
+    procTable->state = PROC_ZOMBIE;
+    if(canExit){
+     procTable->exitCode = _MKWAIT_EXIT(exitcode);  
+    } else {
+      procTable->exitCode = _MKWAIT_SIG(exitcode);
+    }
+    cv_broadcast(procTableW8Cv, procTableLock);
+  } else {
+    procTable->state = PROC_EXITED;
+  }
+
+  for (unsigned int i = 0; i < array_num(allProcs); i++) {
+    struct procTable *curProcTable = array_get(allProcs,i);
+    if((curProcTable->parentPid == procTable->pid) && (curProcTable->state == PROC_ZOMBIE)) {
+      curProcTable->state = PROC_EXITED;
+      curProcTable->parentPid = PROC_NO_PID;
+    }
+  }
+
+  lock_release(procTableLock);
 
   // all kids of this proc need their parent pointers updated & release their 
   // locks (which we acquired at the end of sys_fork() remember? :) )
 
   for (unsigned int i=0; i<array_num(p->childrenprocs); i++) {
     struct proc *childproc = array_get(p->childrenprocs, i);
-
-    // release child's exit lock so it can RIP:
-    lock_release(childproc->exitLock);
 
     // remove child from childrenprocs of p:
     array_remove(p->childrenprocs, i);
@@ -58,15 +89,7 @@ void sys__exit(int exitcode) {
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
 
-  // set exitcode
   p->isProcAlive = false;  // remove from proc_destroy
-  p->procExitStatus = _MKWAIT_EXIT(exitcode);
-
-  // this proc/thread is gone so let parent know we're done!!
-  cv_broadcast(p->w8Cv, p->w8Lock);
-
-  lock_acquire(p->exitLock);
-  lock_release(p->exitLock);
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
@@ -99,8 +122,25 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result;
 
+  lock_acquire(procTable);
   // which process calling waitpid (for supplied PID):
-  struct proc *p = NULL;
+  struct procTable *procTable = NULL;
+
+  for (unsigned int i=0; i<array_num(allProcs); i++) {
+    procTable = array_get(allProcs, i);
+    if (procTable->pid == pid) {
+      break;
+    } else {
+      procTable = NULL;
+    }
+  }
+
+  if (procTable == NULL) {
+    lock_release(procTableLock);
+    return ESRCH;
+  }
+
+  struct proc *parentProc = curproc;
   // check all currently alive processes to see if a proc with this PID exists:
   for (unsigned int i=0; i<array_num(aliveProcs); i++) {
     struct proc *cur = array_get(aliveProcs, i);
@@ -110,35 +150,36 @@ sys_waitpid(pid_t pid,
       }
     }
   }
-  // if couldn't assign to p:
-  if (p == NULL) {
-    *retval = -1;
-    return ESRCH;
-  }
 
-  if (options != 0) {
+  if (parentProc->pid != procTable->pid) {
     *retval = -1;
-    return(EINVAL);
-  }
-
-  // curproc needs to be child, can't w8 on it's own self
-  if (p == curproc) {
-    *retval = -1;
+    lock_release(procTableLock);
     return ECHILD;
   }
 
-  // keep w8ing on proc while its alive before returning (sort of block its thread):
-  lock_acquire(p->w8Lock);
-  while (p->isProcAlive) {
-    cv_wait(p->w8Cv, p->w8Lock);
+  if (options != 0) {
+    if (lock_do_i_hold(procTableLock)) {
+      lock_release(procTableLock);
+    }
+    return(EINVAL);
   }
-  lock_release(p->w8Lock);
+
+  // wait to finish
+  while (procTable->state == PROC_RUNNING) {
+    cv_wait(procTableW8Cv, procTableLock);
+  }
+
 
   /* exitstatus is the procExitStatus */
-  exitstatus = p->procExitStatus;
+  exitstatus = procTable->exitCode;
+  lock_release(procTableLock);
   exitstatus = 0;
   result = copyout((void *)&exitstatus,status,sizeof(int));
+  
   if (result) {
+    if (lock_do_i_hold(procTableLock)) {
+      lock_release(procTableLock);
+    }
     return(result);
   }
   *retval = pid;
@@ -187,9 +228,6 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
     kfree(heaptf);
     return err_no;
   }
-
-  // acquire lock on child so it can't exit before parent (eliminate the zombie case):
-  lock_acquire(childproc->exitLock);
 
   *retval = childproc->pid;
   return 0;
