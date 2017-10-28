@@ -51,7 +51,17 @@ struct semaphore;
 #if OPT_A2
 extern volatile pid_t pid_var;
 extern struct semaphore *pid_var_mutex;
-extern struct array *aliveProcs;
+extern struct array *aliveProcs;		/* for procs */
+extern struct array *allProcs;			/* for procTable */
+extern struct procTable {
+			pid_t pid;
+			pid_t parentPid;
+			int state;					/* zombie, orphan,.... */
+    		int exitCode;
+		};
+extern struct lock *procTableLock;
+extern struct cv *procTableW8Cv;
+
 #endif
 
 /*
@@ -72,10 +82,6 @@ struct proc {
 		volatile pid_t pid;				/* pid for this process */
 		struct array *childrenprocs;	/* array of pointers to child procs */
 		struct proc *parent;			/* pointer to its parent (NULL if no parent) */
-
-		struct lock *exitLock;			/* lock handling exit */
-		struct lock *w8Lock;			/* lock handling waiting */
-		struct cv *w8Cv;				/* cv associated with w8Lock */
 
 		bool isProcAlive;				/* is the proc alive(init to yes in create)? */
 		int procExitStatus;				/* exit code for this proc */
