@@ -139,7 +139,7 @@ proc_destroy(struct proc *proc)
 	P(deletionHandler_mutex);
 	for (unsigned int i=0; i<array_num(aliveProcs); i++) {
 		if (array_get(aliveProcs, i) == proc) {
-			array_remove(aliveProcs, proc);
+			array_remove(aliveProcs, i);
 			break;
 		}
 	}
@@ -274,7 +274,7 @@ proc_bootstrap(void)
   if (deletionHandler_mutex == NULL) {
   	panic("could not create deletionHandler_mutex\n");
   }
-  aliveProcs = array_init();
+  array_init(aliveProcs);
   if (aliveProcs == NULL) {
   	panic("could not create aliveProcs\n");
   }
