@@ -133,9 +133,7 @@ sys_waitpid(pid_t pid,
   }
 
   if (result) {
-    if (lock_do_i_hold(procTableLock)) {
-      lock_release(procTableLock);
-    }
+    lock_release(procTableLock);
     return(result);
   }
 
