@@ -63,6 +63,8 @@ struct proc *kproc;
   volatile pid_t pid_var;
   struct semaphore *pid_var_mutex;
   struct semaphore *deletionHandler_mutex;
+  // alive process:
+  struct array *aliveProcs;
 #endif
 
 /*
@@ -133,6 +135,18 @@ proc_destroy(struct proc *proc)
 	KASSERT(proc != kproc);
 
 	#if OPT_A2
+	// remove from aliveProcs:
+	P(deletionHandler_mutex);
+	for (unsigned int i=0; i<array_num(aliveProcs); i++) {
+		if (array_get(aliveProcs, i) == proc) {
+			array_remove(aliveProcs, proc);
+			break;
+		}
+	}
+
+	// // is not alive anymore: -- > handling in sys_exit()
+	// proc->isProcAlive = 0;
+	V(deletionHandler_mutex);
 
 	P(deletionHandler_mutex);
 
@@ -260,6 +274,10 @@ proc_bootstrap(void)
   if (deletionHandler_mutex == NULL) {
   	panic("could not create deletionHandler_mutex\n");
   }
+  aliveProcs = array_init();
+  if (aliveProcs == NULL) {
+  	panic("could not create aliveProcs\n");
+  }
 #endif		// OPT_A2
 
 #endif // UW 
@@ -326,7 +344,12 @@ proc_create_runprogram(const char *name)
 	V(proc_count_mutex);
 
 	#if OPT_A2
-		
+		// add to aliveProcs first:
+
+		array_add(aliveProcs, proc, NULL);
+
+		proc->isProcAlive = true;
+
 		// keep track of children processes
 		proc->childrenprocs = array_create();
 		if (proc->childrenprocs == NULL) {
