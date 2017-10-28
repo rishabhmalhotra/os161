@@ -173,6 +173,20 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENPROC;
   }
 
+  struct procTable *procTable = NULL;
+
+  for (unsigned int i=0; i<array_num(allProcs); i++) {
+    procTable = array_get(allProcs, i);
+    if (procTable->pid == childproc->pid) {
+      break;
+    } else {
+      procTable = NULL;
+    }
+  }
+
+  procTable->parentPid = curproc->pid; // This means that procTable is the child in sys_fork() of curproc, hence set its parent pid
+
+
   // add childproc to the children array of its parent
   spinlock_acquire(&curproc->p_lock);
   array_add(curproc->childrenprocs, childproc, NULL);
