@@ -39,6 +39,7 @@
 #include <spinlock.h>
 #include <thread.h> /* required for struct threadarray */
 #include <array.h>
+#include <synch.h>
 #include "opt-A2.h"
 
 struct addrspace;
@@ -50,26 +51,34 @@ struct semaphore;
 #if OPT_A2
 extern volatile pid_t pid_var;
 extern struct semaphore *pid_var_mutex;
+extern struct array *aliveProcs;
 #endif
 
 /*
  * Process structure.
  */
 struct proc {
-	char *p_name;			/* Name of this process */
-	struct spinlock p_lock;		/* Lock for this structure */
-	struct threadarray p_threads;	/* Threads in this process */
+	char *p_name;						/* Name of this process */
+	struct spinlock p_lock;				/* Lock for this structure */
+	struct threadarray p_threads;		/* Threads in this process */
 
 	/* VM */
-	struct addrspace *p_addrspace;	/* virtual address space */
+	struct addrspace *p_addrspace;		/* virtual address space */
 
 	/* VFS */
-	struct vnode *p_cwd;		/* current working directory */
+	struct vnode *p_cwd;				/* current working directory */
 
 	#if OPT_A2
-		volatile pid_t pid;						/* pid for this process */
-		struct array* childrenprocs;	/* array of pointers to child procs */
+		volatile pid_t pid;				/* pid for this process */
+		struct array *childrenprocs;	/* array of pointers to child procs */
 		struct proc *parent;			/* pointer to its parent (NULL if no parent) */
+
+		struct lock *exitLock;			/* lock handling exit */
+		struct lock *w8Lock;			/* lock handling waiting */
+		struct cv *w8Cv;				/* cv associated with w8Lock */
+
+		bool isProcAlive;				/* is the proc alive(init to yes in create)? */
+		int procExitStatus;				/* exit code for this proc */
 	#endif
 
 
