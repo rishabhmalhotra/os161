@@ -112,8 +112,10 @@ sys_waitpid(pid_t pid,
   struct proc *p = NULL;
   // check all currently alive processes to see if a proc with this PID exists:
   for (unsigned int i=0; i<array_num(aliveProcs); i++) {
-    if (array_get(aliveProcs, i)->pid == pid) {
-      p = array_get(aliveProcs, i);
+    if (array_get(aliveProcs, i) != NULL) {
+      if (array_get(aliveProcs, i)->pid == pid) {
+        p = array_get(aliveProcs, i);
+      }
     }
   }
   // if couldn't assign to p:
