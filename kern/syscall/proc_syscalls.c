@@ -251,8 +251,14 @@ int sys_execv(const userptr_t program, userptr_t args) {
 	if (result) return result;
 
 	// calculate number of arguments
-	while ((char *)args[numArgs] != NULL) {
-		numArgs++;
+	while (true) {
+		char *temp = NULL;
+      	copyin(args + numArgs * sizeof(char *), &temp, sizeof(char *));
+      	if (temp != NULL) {
+      		numArgs++;
+      	} else {
+      		break;
+      	}
 	}
 
 	// put each of args[] onto kernel space which will be held inside kernArgs[]
