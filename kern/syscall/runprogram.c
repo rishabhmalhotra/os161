@@ -52,7 +52,7 @@
  * Calls vfs_open on progname and thus may destroy it.
  */
 int
-runprogram(char *progname)
+runprogram(char *progname, char **args, int nargs)
 {
 	struct addrspace *as;
 	struct vnode *v;
@@ -99,7 +99,7 @@ runprogram(char *progname)
 
 	#if OPT_A2
 
-	vaddr_t arrayOfStackAddress[numArgs];
+	vaddr_t arrayOfStackAddress[nargs];
   	// NULL terminate
   	arrayOfStackAddress[nargs] = 0;
 
@@ -130,7 +130,7 @@ runprogram(char *progname)
   	#endif
 
 	/* Warp to user mode. */
-	enter_new_process(0 /*argc*/, NULL /*userspace addr of argv*/,
+	enter_new_process(nargs /*argc*/, (userptr_t)stackptr /*userspace addr of argv*/,
 			  stackptr, entrypoint);
 	
 	/* enter_new_process does not return. */
