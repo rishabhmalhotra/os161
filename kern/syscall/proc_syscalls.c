@@ -216,4 +216,141 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   return 0;
 }
 
+int sys_execv(const char *program, char **args) {
+	// err chk:
+	if (program == NULL) {
+		return EFAULT;
+	}
+
+	if(strlen((char *)program) > PATH_MAX){
+    	return E2BIG;
+  	}
+
+	if(args == NULL){
+    	return EFAULT;
+  	}
+
+	int numArgs = 0;
+	int result;
+
+	// bring new prog on heap
+	size_t progLen = strlen(program) + 1;								// + 1 for NULL terminating
+	char *prog = kmalloc(sizeof(char *) * progLen);
+	// put program into prog ie space allocated in kernel (bring in from userspace)
+	result = copyinstr((userptr_t)program, prog, progLen, NULL);
+
+	// err chk
+	if (prog == NULL) {
+		return ENOMEM; 
+	}
+	// from copyinout
+	if (result) return result;
+
+	// calculate number of arguments
+	while (args[numArgs] != NULL) {
+		numArgs++;
+	}
+
+	// put each of args[] onto kernel space which will be held inside kernArgs[]
+	char **kernArgs = kmalloc((numArgs+1) * sizeof(char));
+	if (kernArgs == NULL) return ENOMEM;
+
+	// NULL terminated
+	kernArgs[numArgs] = NULL;
+
+	for (unsigned int i=0; i<numArgs; i++) {
+		kernArgLen = strlen(args[i]) + 1;
+		kernArgs[i] = kmalloc(sizeof(char) * kernArgLen);
+		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
+		result = copyinstr((userptr_t)args[i], kernArgs[i], kernArgLen, NULL);
+		if (result) return result;
+	}
+
+	// next few steps copied from runprogram
+	struct addrspace *as;
+	struct addrspace *asNew;
+	struct vnode *v;
+	vaddr_t entrypoint, stackptr;
+
+
+	// open prog
+	char * progNew;
+	progNewTemp = kstrdup(program);
+	result = vfs_open(progNewTemp, O_RDONLY, 0, &v);
+	kfree(progNewTemp);
+	if (result) return result;
+
+	// create addrspace(asNew)
+	asNew = as_create();
+	if (asNew == NULL) {
+		vfs_close(v);
+		return ENOMEM;
+	}
+
+	// switch & activate
+	curproc_setas(asNew);
+	as_activate();												// flush TLB (as discussed in class)
+
+	// load executable
+	result = load_elf(v, &entrypoint);
+	if (result) {
+		curproc_setas(as);
+    	// p_addrspace will go away when curproc is destroyed
+    	vfs_close(v);
+    	return result;
+  	}
+
+  	// done with file now
+  	vfs_close(v);
+
+  	// define user stack in the addrspace
+  	result = as_define_stack(asNew, &stackptr);
+  	if (result) {
+  		curproc_setas(as);
+    	// p_addrspace will go away when curproc is destroyed
+    	return result;
+  	}
+
+  	// array to hold where stackptr is pointing at for each arg
+  	vaddr_t arrayOfStackAddress[numArgs];
+  	// NULL terminate
+  	arrayOfStackAddress[numArgs] = NULL;
+
+  	for(int i=(numArgs-1); i>=0; i--) {
+
+  		int kernArgLen = strlen(kernArgs[i]) + 1;
+
+  		// each string to be 8-byte aligned:
+  		stackptr -= ROUNDUP(kernArgLen, 8); 			// each char is 1 byte so kernArgLen Bytes
+
+  		// put onto userspace from kern space:
+  		result = copyoutstr(kernArgs[i], (userptr_t)stackptr, kernArgLen, NULL);
+
+  		if (result) return result;
+
+  		// set this array for arg i to point to where stackptr points at ie towards the arg i
+  		arrayOfStackAddress[i] = stackptr;
+  	}
+
+  	// now we need to copy the args (or pointers to, thereof)
+
+  	for (int i=(numArgs-1); i>=0; i--) {
+  		stackptr -= ROUNDUP(sizeof(vaddr_t), 4);		// vaddr_t is the type of pointers, round to 4 bytes as in ass. spec
+  		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
+  		if (result) return result;
+  	}
+
+
+  	// from runprog:
+
+  	as_destroy(as);
+
+  	// Warp to user mode:
+  	enter_new_process(argc, (userptr_t)stackptr, stackptr, entrypoint);
+  	/* enter_new_process does not return. */
+  	panic("enter_new_process returned\n");
+  	return EINVAL;
+
+  }
+
 #endif  // OPT_A2
