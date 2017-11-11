@@ -220,7 +220,7 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   return 0;
 }
 
-int sys_execv(const char *program, char **args) {
+int sys_execv(const userptr_t program, userptr_t args) {
 	// err chk:
 	if (program == NULL) {
 		return EFAULT;
@@ -230,7 +230,7 @@ int sys_execv(const char *program, char **args) {
     	return E2BIG;
   	}
 
-	if(args == NULL){
+	if(args == NULL) {
     	return EFAULT;
   	}
 
@@ -238,10 +238,10 @@ int sys_execv(const char *program, char **args) {
 	int result;
 
 	// bring new prog on heap
-	size_t progLen = strlen(program) + 1;								// + 1 for NULL terminating
+	size_t progLen = strlen((char *)program) + 1;								// + 1 for NULL terminating
 	char *prog = kmalloc(sizeof(char *) * progLen);
 	// put program into prog ie space allocated in kernel (bring in from userspace)
-	result = copyinstr((userptr_t)program, prog, progLen, NULL);
+	result = copyinstr(program, prog, progLen, NULL);
 
 	// err chk
 	if (prog == NULL) {
@@ -256,17 +256,17 @@ int sys_execv(const char *program, char **args) {
 	}
 
 	// put each of args[] onto kernel space which will be held inside kernArgs[]
-	char **kernArgs = kmalloc((numArgs+1) * sizeof(char));
+	char **kernArgs = kmalloc((numArgs+1) * sizeof(char *));
 	if (kernArgs == NULL) return ENOMEM;
 
 	// NULL terminated
 	kernArgs[numArgs] = NULL;
 
 	for (int i=0; i<numArgs; i++) {
-		int kernArgLen = strlen(args[i]) + 1;
+		int kernArgLen = strlen((char *)args[i]) + 1;
 		kernArgs[i] = kmalloc(sizeof(char) * kernArgLen);
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
-		result = copyinstr((userptr_t)args[i], kernArgs[i], kernArgLen, NULL);
+		result = copyinstr(args[i], kernArgs[i], kernArgLen, NULL);
 		if (result) return result;
 	}
 
@@ -279,7 +279,8 @@ int sys_execv(const char *program, char **args) {
 
 	// open prog
 	char *progNewTemp;
-	progNewTemp = kstrdup(program);
+	progNewTemp = kstrdup((char *)program);
+	if (progNewTemp == NULL) return ENOMEM;
 	result = vfs_open(progNewTemp, O_RDONLY, 0, &v);
 	kfree(progNewTemp);
 	if (result) return result;
@@ -299,6 +300,7 @@ int sys_execv(const char *program, char **args) {
 	result = load_elf(v, &entrypoint);
 	if (result) {
 		curproc_setas(as);
+		as_destroy(asNew);
     	// p_addrspace will go away when curproc is destroyed
     	vfs_close(v);
     	return result;
@@ -311,6 +313,7 @@ int sys_execv(const char *program, char **args) {
   	result = as_define_stack(asNew, &stackptr);
   	if (result) {
   		curproc_setas(as);
+  		as_destroy(asNew);
     	// p_addrspace will go away when curproc is destroyed
     	return result;
   	}
