@@ -258,8 +258,8 @@ int sys_execv(const char *program, char **args) {
 	// NULL terminated
 	kernArgs[numArgs] = NULL;
 
-	for (unsigned int i=0; i<numArgs; i++) {
-		kernArgLen = strlen(args[i]) + 1;
+	for (int i=0; i<numArgs; i++) {
+		int kernArgLen = strlen(args[i]) + 1;
 		kernArgs[i] = kmalloc(sizeof(char) * kernArgLen);
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
 		result = copyinstr((userptr_t)args[i], kernArgs[i], kernArgLen, NULL);
@@ -274,7 +274,7 @@ int sys_execv(const char *program, char **args) {
 
 
 	// open prog
-	char * progNew;
+	char *progNewTemp;
 	progNewTemp = kstrdup(program);
 	result = vfs_open(progNewTemp, O_RDONLY, 0, &v);
 	kfree(progNewTemp);
@@ -346,7 +346,7 @@ int sys_execv(const char *program, char **args) {
   	as_destroy(as);
 
   	// Warp to user mode:
-  	enter_new_process(argc, (userptr_t)stackptr, stackptr, entrypoint);
+  	enter_new_process(numArgs, (userptr_t)stackptr, stackptr, entrypoint);
   	/* enter_new_process does not return. */
   	panic("enter_new_process returned\n");
   	return EINVAL;
