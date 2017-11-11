@@ -44,6 +44,9 @@
 #include <vfs.h>
 #include <syscall.h>
 #include <test.h>
+#include <limits.h>
+#include <copyinout.h>
+#include <opt-A2.h>
 
 /*
  * Load program "progname" and start running it in usermode.
@@ -103,12 +106,12 @@ runprogram(char *progname, char **args, int nargs)
   	// NULL terminate
   	arrayOfStackAddress[nargs] = 0;
 
-  	for(int i=(numArgs-1); i>=0; i--) {
+  	for(int i=(nargs-1); i>=0; i--) {
 
   		int argLen = strlen(args[i]) + 1;
 
   		// each string to be 8-byte aligned:
-  		stackptr -= ROUNDUP(kernArgLen, 8); 			// each char is 1 byte so kernArgLen Bytes
+  		stackptr -= ROUNDUP(argLen, 8); 			// each char is 1 byte so kernArgLen Bytes
 
   		// put onto userspace from kern space:
   		result = copyoutstr(args[i], (userptr_t)stackptr, argLen, NULL);
