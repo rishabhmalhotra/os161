@@ -385,6 +385,7 @@ proc_create_runprogram(const char *name)
   		struct procTable *procTable = kmalloc(sizeof(struct procTable));
   		procTable->pid = proc->pid;
   		procTable->state = ActiveProc;
+  		// procTable is the child of curproc
   		procTable->parentPid = curproc->pid;
 		procTable->exitCode = 0;
 
