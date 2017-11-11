@@ -15,6 +15,7 @@
 #include <limits.h>
 #include <synch.h>
 #include <vfs.h>
+#include <vm.h>
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
@@ -316,7 +317,7 @@ int sys_execv(const char *program, char **args) {
   	// array to hold where stackptr is pointing at for each arg
   	vaddr_t arrayOfStackAddress[numArgs];
   	// NULL terminate
-  	arrayOfStackAddress[numArgs] = NULL;
+  	arrayOfStackAddress[numArgs] = 0;
 
   	for(int i=(numArgs-1); i>=0; i--) {
 
