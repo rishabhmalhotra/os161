@@ -97,6 +97,38 @@ runprogram(char *progname)
 		return result;
 	}
 
+	#if OPT_A2
+
+	vaddr_t arrayOfStackAddress[numArgs];
+  	// NULL terminate
+  	arrayOfStackAddress[nargs] = 0;
+
+  	for(int i=(numArgs-1); i>=0; i--) {
+
+  		int argLen = strlen(args[i]) + 1;
+
+  		// each string to be 8-byte aligned:
+  		stackptr -= ROUNDUP(kernArgLen, 8); 			// each char is 1 byte so kernArgLen Bytes
+
+  		// put onto userspace from kern space:
+  		result = copyoutstr(args[i], (userptr_t)stackptr, argLen, NULL);
+
+  		if (result) return result;
+
+  		// set this array for arg i to point to where stackptr points at ie towards the arg i
+  		arrayOfStackAddress[i] = stackptr;
+  	}
+
+  	// now we need to copy the args (or pointers to, thereof)
+
+  	for (int i=(numArgs-1); i>=0; i--) {
+  		stackptr -= ROUNDUP(sizeof(vaddr_t), 4);		// vaddr_t is the type of pointers, round to 4 bytes as in ass. spec
+  		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
+  		if (result) return result;
+  	}
+
+  	#endif
+
 	/* Warp to user mode. */
 	enter_new_process(0 /*argc*/, NULL /*userspace addr of argv*/,
 			  stackptr, entrypoint);
