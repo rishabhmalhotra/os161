@@ -251,7 +251,7 @@ int sys_execv(const userptr_t program, userptr_t args) {
 	if (result) return result;
 
 	// calculate number of arguments
-	while (args[numArgs] != NULL) {
+	while ((char *)args[numArgs] != NULL) {
 		numArgs++;
 	}
 
@@ -266,7 +266,7 @@ int sys_execv(const userptr_t program, userptr_t args) {
 		int kernArgLen = strlen((char *)args[i]) + 1;
 		kernArgs[i] = kmalloc(sizeof(char) * kernArgLen);
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
-		result = copyinstr(args[i], kernArgs[i], kernArgLen, NULL);
+		result = copyinstr((char *)args[i], kernArgs[i], kernArgLen, NULL);
 		if (result) return result;
 	}
 
