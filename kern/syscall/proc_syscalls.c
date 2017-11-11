@@ -225,7 +225,7 @@ int sys_execv(const char *program, char **args) {
 		return EFAULT;
 	}
 
-	if(strlen((char *)program) > PATH_MAX){
+	if(strlen((char *)program) > PATH_MAX) {
     	return E2BIG;
   	}
 
