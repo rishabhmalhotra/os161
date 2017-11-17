@@ -100,7 +100,7 @@ runprogram(char *progname, char **args, int nargs)
 		return result;
 	}
 
-	#if OPT_A2
+	#ifdef OPT_A2
 
 	vaddr_t arrayOfStackAddress[nargs];
   	// NULL terminate
