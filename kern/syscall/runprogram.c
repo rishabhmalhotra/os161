@@ -102,7 +102,7 @@ runprogram(char *progname, char **args, int nargs)
 
 	#if OPT_A2
 
-	printf("Hello\n");
+	kprintf("Hello\n");
 
 	vaddr_t arrayOfStackAddress[nargs];
   	// NULL terminate
