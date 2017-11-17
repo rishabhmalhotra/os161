@@ -108,16 +108,12 @@ runprogram(char *progname, char **args, int nargs)
 
   	for(int i=(nargs-1); i>=0; i--) {
 
-  		kprintf("run number: %d \n", i);
-  		kprintf("args[i]: %s", args[i]);
-
   		int argLen = strlen(args[i]) + 1;
 
   		// each string to be 8-byte aligned:
   		stackptr -= ROUNDUP(argLen, 8); 			// each char is 1 byte so kernArgLen Bytes
 
   		// put onto userspace from kern space:
-  		kprintf("%d: %s\n", i, args[i]);
   		result = copyoutstr(args[i], (userptr_t)stackptr, argLen, NULL);
 
   		if (result) return result;
@@ -129,9 +125,15 @@ runprogram(char *progname, char **args, int nargs)
   	// now we need to copy the args (or pointers to, thereof)
 
   	for (int i=(nargs-1); i>=0; i--) {
+
+  		kprintf("run number: %d \n", i);
+  		kprintf("args[i]: %s\n", args[i]);
+
   		stackptr -= ROUNDUP(sizeof(vaddr_t), 4);											// round to 4 bytes as in ass. spec
   		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
-  		// kprintf("Hello2[%d]\n", i);
+
+  		kprintf("%d: %s\n", i, args[i]);
+  		
   		if (result) return result;
   	}
 
