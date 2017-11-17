@@ -108,6 +108,9 @@ runprogram(char *progname, char **args, int nargs)
 
   	for(int i=(nargs-1); i>=0; i--) {
 
+  		kprintf("run number: %d \n", i);
+  		kprintf("args[i]: %s", args[i]);
+
   		int argLen = strlen(args[i]) + 1;
 
   		// each string to be 8-byte aligned:
