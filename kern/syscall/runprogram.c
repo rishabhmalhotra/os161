@@ -122,6 +122,8 @@ runprogram(char *progname, char **args, int nargs)
   		arrayOfStackAddress[i] = stackptr;
   	}
 
+  	kprintf("%s\n", args[2]);
+
   	// now we need to copy the args (or pointers to, thereof)
 
   	for (int i=(nargs-1); i>=0; i--) {
@@ -133,7 +135,7 @@ runprogram(char *progname, char **args, int nargs)
   		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
 
   		kprintf("%d: %s\n", i, args[i]);
-  		
+
   		if (result) return result;
   	}
 
