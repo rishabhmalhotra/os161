@@ -100,7 +100,9 @@ runprogram(char *progname, char **args, int nargs)
 		return result;
 	}
 
-	#ifdef A2_OPT
+	#if OPT_A2
+
+	printf("Hello\n");
 
 	vaddr_t arrayOfStackAddress[nargs];
   	// NULL terminate
@@ -126,7 +128,7 @@ runprogram(char *progname, char **args, int nargs)
 
   	for (int i=(nargs-1); i>=0; i--) {
   		stackptr -= ROUNDUP(sizeof(vaddr_t), 4);											// round to 4 bytes as in ass. spec
-  		result = copyout(&arrayOfStackAddress + i, (userptr_t)stackptr, sizeof(vaddr_t));
+  		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
   		if (result) return result;
   	}
 
