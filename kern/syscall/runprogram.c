@@ -126,6 +126,7 @@ runprogram(char *progname, char **args, int nargs)
 
   	for (int i=(nargs-1); i>=0; i--) {
   		stackptr -= ROUNDUP(sizeof(vaddr_t), 4);											// round to 4 bytes as in ass. spec
+  		printf("Hello\n");
   		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
   		if (result) return result;
   	}
