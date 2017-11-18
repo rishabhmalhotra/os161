@@ -220,7 +220,9 @@ sys_fork(struct trapframe *tf, pid_t *retval) {
   return 0;
 }
 
-int sys_execv(const userptr_t program, userptr_t args) {
+// int sys_execv(const userptr_t program, userptr_t args) {
+int sys_execv(char *program, char **args) {
+
 	// err chk:
 	if (program == NULL) {
 		return EFAULT;
@@ -252,18 +254,22 @@ int sys_execv(const userptr_t program, userptr_t args) {
 	}
 
 	// calculate number of arguments
-	while (true) {
-		char *temp = NULL;
-      	copyin(args + (numArgs * sizeof(char *)), &temp, sizeof(char *));
-      	if (temp != NULL) {
-      		numArgs++;
-      	} else {
-      		break;
-      	}
+	// while (true) {
+	// 	char *temp = NULL;
+ //      	copyin(args + (numArgs * sizeof(char *)), &temp, sizeof(char *));
+ //      	if (temp != NULL) {
+ //      		numArgs++;
+ //      	} else {
+ //      		break;
+ //      	}
+	// }
+
+	while(args[numArgs] != NULL){
+    	numArgs++;
 	}
 
 	// put each of args[] onto kernel space which will be held inside kernArgs[]
-	char **kernArgs = kmalloc((numArgs+1) * sizeof(char *));
+	char **kernArgs = kmalloc((numArgs+1) * sizeof(char));
 	if (kernArgs == NULL) return ENOMEM;
 
 	// NULL terminated
@@ -273,9 +279,10 @@ int sys_execv(const userptr_t program, userptr_t args) {
 		argLen = strlen(args[i]) + 1;
 		kernArgs[i] = kmalloc(argLen * sizeof(char));			///////////////////////////////////////
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
-		char *temp = args[i];
+		// char *temp = args[i];
       	// copyin(args + (i * sizeof(char *)), &temp, sizeof(char *));
-		result = copyinstr((const_userptr_t)temp, kernArgs[i], argLen, NULL);
+		// result = copyinstr((const_userptr_t)temp, kernArgs[i], argLen, NULL);
+		result = copyinstr((userptr_t)args[i], kernArgs[i], argLen, NULL);
 		if (result) return result;
 	}
 
