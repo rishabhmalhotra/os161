@@ -331,10 +331,8 @@ int sys_execv(const userptr_t program, userptr_t args) {
   	// NULL terminate
   	arrayOfStackAddress[numArgs] = 0;
 
-  	if ((stackptr % 8) != 0) {
-  		while((stackptr % 8) != 0) {
-  			stackptr--;
-  		}
+ 	while((stackptr % 8) != 0) {
+  		stackptr--;
   	}
 
   	for(int i=(numArgs-1); i>=0; i--) {
@@ -353,10 +351,8 @@ int sys_execv(const userptr_t program, userptr_t args) {
   		arrayOfStackAddress[i] = stackptr;
   	}
 
-  	if ((stackptr % 4) != 0) {
-  		while((stackptr % 4) != 0) {
-  			stackptr--;
-  		}
+  	while((stackptr % 4) != 0) {
+  		stackptr--;
   	}
 
   	// now we need to copy the args (or pointers to, thereof)
