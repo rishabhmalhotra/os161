@@ -106,10 +106,8 @@ runprogram(char *progname, char **args, int nargs)
   	// NULL terminate
   	arrayOfStackAddress[nargs] = 0;
 
-  	if ((stackptr % 8) != 0) {
-  		while((stackptr % 8) != 0) {
-  			stackptr--;
-  		}
+  	while((stackptr % 8) != 0) {
+		stackptr--;
   	}
 
   	for(int i=(nargs-1); i>=0; i--) {
@@ -128,10 +126,8 @@ runprogram(char *progname, char **args, int nargs)
   		arrayOfStackAddress[i] = stackptr;
   	}
 
-  	if ((stackptr % 4) != 0) {
-  		while((stackptr % 4) != 0) {
-  			stackptr--;
-  		}
+  	while((stackptr % 4) != 0) {
+  		stackptr--;
   	}
 
   	// now we need to copy the args (or pointers to, thereof)
