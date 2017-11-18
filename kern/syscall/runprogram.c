@@ -103,6 +103,8 @@ runprogram(char *progname, char **args, int nargs)
 	#if OPT_A2
 
 	vaddr_t arrayOfStackAddress[nargs+1];
+	// NULL terminate
+  	arrayOfStackAddress[nargs] = 0;
 
   	while((stackptr % 8) != 0) {
 		stackptr--;
@@ -123,9 +125,6 @@ runprogram(char *progname, char **args, int nargs)
   		// set this array for arg i to point to where stackptr points at ie towards the arg i
   		arrayOfStackAddress[i] = stackptr;
   	}
-
-  	// NULL terminate
-  	arrayOfStackAddress[nargs] = 0;
 
   	while((stackptr % 4) != 0) {
   		stackptr--;
