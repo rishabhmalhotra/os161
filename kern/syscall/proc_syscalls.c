@@ -226,9 +226,9 @@ int sys_execv(const userptr_t program, userptr_t args) {
 		return EFAULT;
 	}
 
-	// if(strlen((char *)program) > PATH_MAX) {
- //    	return E2BIG;
- //  	}
+	if(strlen((char *)program) > PATH_MAX) {
+    	return E2BIG;
+  	}
 
 	if(args == NULL) {
     	return EFAULT;
