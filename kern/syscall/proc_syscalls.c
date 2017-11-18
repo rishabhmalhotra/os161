@@ -262,8 +262,6 @@ int sys_execv(const userptr_t program, userptr_t args) {
       	}
 	}
 
-	kprintf("numArgs: %d\n", numArgs);
-
 	// put each of args[] onto kernel space which will be held inside kernArgs[]
 	char **kernArgs = kmalloc((numArgs+1) * sizeof(char *));
 	if (kernArgs == NULL) return ENOMEM;
@@ -276,7 +274,7 @@ int sys_execv(const userptr_t program, userptr_t args) {
 		kernArgs[i] = kmalloc(kernArgLen * sizeof (char));			///////////////////////////////////////
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
 		char *temp = NULL;
-      	copyin(args + (i * sizeof(char *)), &temp, sizeof(char *));
+      	copyin(args + (i * sizeof(char)), &temp, sizeof(char));
 		result = copyinstr((const_userptr_t)temp, kernArgs[i], kernArgLen, NULL);
 		if (result) return result;
 	}
