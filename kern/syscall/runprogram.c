@@ -100,11 +100,9 @@ runprogram(char *progname, char **args, int nargs)
 		return result;
 	}
 
-	// #if OPT_A2
+	#if OPT_A2
 
-	vaddr_t arrayOfStackAddress[nargs];
-  	// NULL terminate
-  	arrayOfStackAddress[nargs] = 0;
+	vaddr_t arrayOfStackAddress[nargs+1];
 
   	while((stackptr % 8) != 0) {
 		stackptr--;
@@ -126,6 +124,9 @@ runprogram(char *progname, char **args, int nargs)
   		arrayOfStackAddress[i] = stackptr;
   	}
 
+  	// NULL terminate
+  	arrayOfStackAddress[nargs] = 0;
+
   	while((stackptr % 4) != 0) {
   		stackptr--;
   	}
@@ -140,7 +141,7 @@ runprogram(char *progname, char **args, int nargs)
   		if (result) return result;
   	}
 
-  	// #endif
+  	#endif
 
 	/* Warp to user mode. */
 	enter_new_process(nargs /*argc*/, (userptr_t)stackptr /*userspace addr of argv*/,
