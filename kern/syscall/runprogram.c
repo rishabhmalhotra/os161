@@ -106,6 +106,12 @@ runprogram(char *progname, char **args, int nargs)
   	// NULL terminate
   	arrayOfStackAddress[nargs] = 0;
 
+  	if ((stackptr % 8) != 0) {
+  		while((stackptr % 8) != 0) {
+  			stackptr--;
+  		}
+  	}
+
   	for(int i=(nargs-1); i>=0; i--) {
 
   		int argLen = strlen(args[i]) + 1;
