@@ -331,6 +331,12 @@ int sys_execv(const userptr_t program, userptr_t args) {
   	// NULL terminate
   	arrayOfStackAddress[numArgs] = 0;
 
+  	if ((stackptr % 8) != 0) {
+  		while((stackptr % 8) != 0) {
+  			stackptr--;
+  		}
+  	}
+
   	for(int i=(numArgs-1); i>=0; i--) {
 
   		int kernArgLen = strlen(kernArgs[i]) + 1;
