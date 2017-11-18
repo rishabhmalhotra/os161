@@ -357,7 +357,7 @@ int sys_execv(const userptr_t program, userptr_t args) {
 
   	// now we need to copy the args (or pointers to, thereof)
 
-  	for (int i=(numArgs-1); i>=0; i--) {
+  	for (int i=numArgs; i>=0; i--) {
   		stackptr -= ROUNDUP(sizeof(vaddr_t), 4);		// vaddr_t is the type of pointers, round to 4 bytes as in ass. spec
   		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
   		if (result) return result;
