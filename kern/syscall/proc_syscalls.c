@@ -270,12 +270,11 @@ int sys_execv(const userptr_t program, userptr_t args) {
 	kernArgs[numArgs] = NULL;
 
 	for (int i=0; i<numArgs; i++) {
-		int kernArgLen = strlen(kernArgs[i]) + 1;
-		kernArgs[i] = kmalloc(ARG_MAX);//(kernArgLen * sizeof(char));			///////////////////////////////////////
+		kernArgs[i] = kmalloc(kernArgLen * sizeof(char *));			///////////////////////////////////////
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
 		char *temp = args[i];
       	// copyin(args + (i * sizeof(char *)), &temp, sizeof(char *));
-		result = copyinstr((const_userptr_t)temp, kernArgs[i], kernArgLen, NULL);
+		result = copyinstr((const_userptr_t)temp, kernArgs[i], ARG_MAX, NULL);
 		if (result) return result;
 	}
 
