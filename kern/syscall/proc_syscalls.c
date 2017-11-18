@@ -240,15 +240,16 @@ int sys_execv(const userptr_t program, userptr_t args) {
 	// bring new prog on heap
 	size_t progLen = strlen((char *)program) + 1;								// + 1 for NULL terminating
 	char *prog = kmalloc(sizeof(char *) * progLen);
+	
 	// put program into prog ie space allocated in kernel (bring in from userspace)
 	result = copyinstr(program, prog, progLen, NULL);
+	// from copyinout
+	if (result) return result;
 
 	// err chk
 	if (prog == NULL) {
 		return ENOMEM; 
 	}
-	// from copyinout
-	if (result) return result;
 
 	// calculate number of arguments
 	while (true) {
@@ -270,7 +271,7 @@ int sys_execv(const userptr_t program, userptr_t args) {
 
 	for (int i=0; i<numArgs; i++) {
 		int kernArgLen = strlen(kernArgs[i]) + 1;
-		kernArgs[i] = kmalloc(kernArgLen);
+		kernArgs[i] = kmalloc(kernArgLen * sizeof (char));////////////////////
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
 		char *temp = NULL;
       	copyin(args + (i * sizeof(char *)), &temp, sizeof(char *));
