@@ -327,7 +327,7 @@ int sys_execv(const userptr_t program, userptr_t args) {
   	}
 
   	// array to hold where stackptr is pointing at for each arg
-  	vaddr_t arrayOfStackAddress[numArgs];
+  	vaddr_t arrayOfStackAddress[numArgs+1];
   	// NULL terminate
   	arrayOfStackAddress[numArgs] = 0;
 
