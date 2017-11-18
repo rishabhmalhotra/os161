@@ -132,7 +132,7 @@ runprogram(char *progname, char **args, int nargs)
 
   	// now we need to copy the args (or pointers to, thereof)
 
-  	for (int i=(nargs); i>=0; i--) {
+  	for (int i=nargs; i>=0; i--) {
 
   		stackptr -= ROUNDUP(sizeof(vaddr_t), 4);											// round to 4 bytes as in ass. spec
   		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
