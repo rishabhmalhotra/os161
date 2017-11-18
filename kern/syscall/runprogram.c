@@ -122,19 +122,18 @@ runprogram(char *progname, char **args, int nargs)
   		arrayOfStackAddress[i] = stackptr;
   	}
 
-  	kprintf("%s\n", args[2]);
+  	if ((stackptr % 4) != 0) {
+  		while((stackptr % 4) != 0) {
+  			stackptr--;
+  		}
+  	}
 
   	// now we need to copy the args (or pointers to, thereof)
 
   	for (int i=(nargs-1); i>=0; i--) {
 
-  		kprintf("run number: %d \n", i);
-  		kprintf("args[i]: %s\n", args[i]);
-
   		stackptr -= ROUNDUP(sizeof(vaddr_t), 4);											// round to 4 bytes as in ass. spec
   		result = copyout(&arrayOfStackAddress[i], (userptr_t)stackptr, sizeof(vaddr_t));
-
-  		kprintf("%d: %s\n", i, args[i]);
 
   		if (result) return result;
   	}
