@@ -100,7 +100,7 @@ runprogram(char *progname, char **args, int nargs)
 		return result;
 	}
 
-	#if OPT_A2
+	// #if OPT_A2
 
 	vaddr_t arrayOfStackAddress[nargs];
   	// NULL terminate
@@ -140,7 +140,7 @@ runprogram(char *progname, char **args, int nargs)
   		if (result) return result;
   	}
 
-  	#endif
+  	// #endif
 
 	/* Warp to user mode. */
 	enter_new_process(nargs /*argc*/, (userptr_t)stackptr /*userspace addr of argv*/,
