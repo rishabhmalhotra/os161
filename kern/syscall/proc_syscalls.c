@@ -277,7 +277,7 @@ int sys_execv(char *program, char **args) {
 
 	for (int i=0; i<numArgs; i++) {
 		int argLen = strlen(args[i]) + 1;
-		kernArgs[i] = kmalloc(argLen * sizeof(char));			///////////////////////////////////////
+		kernArgs[i] = kmalloc(argLen * sizeof(char));
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
 		// char *temp = args[i];
       	// copyin(args + (i * sizeof(char *)), &temp, sizeof(char *));
@@ -374,7 +374,7 @@ int sys_execv(char *program, char **args) {
 
   	// from runprog:
 
-  	as_destroy(as);
+  	// as_destroy(as);
 
   	// Warp to user mode:
   	enter_new_process(numArgs, (userptr_t)stackptr, stackptr, entrypoint);
