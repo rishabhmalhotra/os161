@@ -244,7 +244,7 @@ int sys_execv(char *program, char **args) {
 	char *prog = kmalloc(sizeof(char *) * progLen);
 	
 	// put program into prog ie space allocated in kernel (bring in from userspace)
-	result = copyinstr(program, prog, progLen, NULL);
+	result = copyinstr((userptr_t)program, prog, progLen, NULL);
 	// from copyinout
 	if (result) return result;
 
@@ -276,7 +276,7 @@ int sys_execv(char *program, char **args) {
 	kernArgs[numArgs] = NULL;
 
 	for (int i=0; i<numArgs; i++) {
-		argLen = strlen(args[i]) + 1;
+		int argLen = strlen(args[i]) + 1;
 		kernArgs[i] = kmalloc(argLen * sizeof(char));			///////////////////////////////////////
 		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
 		// char *temp = args[i];
