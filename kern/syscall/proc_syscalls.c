@@ -271,13 +271,20 @@ int sys_execv(const userptr_t program, userptr_t args) {
 
 	for (int i=0; i<numArgs; i++) {
 		int kernArgLen = strlen(kernArgs[i]) + 1;
-		kernArgs[i] = kmalloc(ARG_MAX);//kmalloc(kernArgLen * sizeof (char));			///////////////////////////////////////
-		// put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
-		//char *temp = NULL;
-      	//copyin(args + (i * sizeof(char *)), &temp, sizeof(char *));
-		//result = copyinstr((const_userptr_t)temp, kernArgs[i], kernArgLen, NULL);
-		result = copyinstr((const_userptr_t)args[i], kernArgs[i], kernArgLen, NULL);
-		if (result) return result;
+		// kernArgs[i] = kmalloc(kernArgLen * sizeof (char));			///////////////////////////////////////
+		// // put args[i] from userspace into kernArgs[i] ie onto kernel space (kernArgLen bytes; including NULL terminator)
+		// //char *temp = NULL;
+  //     	//copyin(args + (i * sizeof(char *)), &temp, sizeof(char *));
+		// //result = copyinstr((const_userptr_t)temp, kernArgs[i], kernArgLen, NULL);
+		// result = copyinstr((const_userptr_t)args[i], kernArgs[i], kernArgLen, NULL);
+		// if (result) return result;
+
+		kernelArgs[i] = kmalloc(ARG_MAX);
+    	char *temp;
+    	arg = kernelArgs[i];
+    	int len;
+
+		result = copyinstr((const_userptr_t)temp, kernelArgs[i], ARG_MAX, &len);
 	}
 
 	// next few steps copied from runprogram
