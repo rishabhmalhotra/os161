@@ -37,6 +37,8 @@
 #include <mips/tlb.h>
 #include <addrspace.h>
 #include <vm.h>
+#include <tlb.h>
+#include "opt-A3.h"
 
 /*
  * Dumb MIPS-only "VM system" that is intended to only be just barely
@@ -104,6 +106,7 @@ vm_tlbshootdown(const struct tlbshootdown *ts)
 	panic("dumbvm tried to do tlb shootdown?!\n");
 }
 
+// A3 changing code to handle TLB when full so no panicks
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
@@ -200,7 +203,21 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		return 0;
 	}
 
-	kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
+	#if OPT_A3
+	// right now we return EFAULT & say ran out of tlb entries, can't handle page fault
+	// because the TLB is out of space. Our simple modification solution to this issue:
+	// select an existing TLB entry at random, throw it out & put the new entry, then cont
+	// without returning an error:
+
+	ehi = faultaddress;
+	elo = (TLBLO_VALID) || (TLBLO_DIRTY) | (paddr);
+
+	tlb_random(ehi, elo);
+
+	// kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
+
+	#endif // OPT_A3
+
 	splx(spl);
 	return EFAULT;
 }
