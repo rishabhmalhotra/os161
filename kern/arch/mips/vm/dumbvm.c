@@ -37,7 +37,6 @@
 #include <mips/tlb.h>
 #include <addrspace.h>
 #include <vm.h>
-#include <tlb.h>
 #include "opt-A3.h"
 
 /*
