@@ -218,7 +218,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	#endif // OPT_A3
 
 	splx(spl);
-	return EFAULT;
+	return 0;
+	// return EFAULT;
 }
 
 struct addrspace *
