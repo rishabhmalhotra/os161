@@ -49,8 +49,8 @@ void sys__exit(int exitcode, bool isNotUsermodeException) {
   if (procTable->parentPid != NoPidForProc) {
     procTable->state = ZombieProc;
     #if OPT_A3
-    if (isUsermodeException) {
-    	procTable->exitcode = _MKWAIT_EXIT(exitcode);
+    if (isNotUsermodeException) {
+    	procTable->exitCode = _MKWAIT_EXIT(exitcode);
     } else {
     	// if user mode exception coming from kill_curthread
     	procTable->exitCode = _MKWAIT_SIG(exitcode);
