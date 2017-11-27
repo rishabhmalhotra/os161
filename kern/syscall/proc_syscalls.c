@@ -10,6 +10,7 @@
 #include <addrspace.h>
 #include <copyinout.h>
 #include "opt-A2.h"
+#include "opt-A3.h"
 #include <array.h>
 #include <mips/trapframe.h>
 #include <limits.h>
@@ -22,7 +23,7 @@
   /* this needs to be fixed to get exit() and waitpid() working properly */
 #if OPT_A2
 
-void sys__exit(int exitcode) {
+void sys__exit(int exitcode, bool isNotUsermodeException) {
 
   struct addrspace *as;
   struct proc *p = curproc;
@@ -47,8 +48,14 @@ void sys__exit(int exitcode) {
 
   if (procTable->parentPid != NoPidForProc) {
     procTable->state = ZombieProc;
-    procTable->exitCode = _MKWAIT_EXIT(exitcode);  
-    // cv_broadcast(procTableW8Cv, procTableLock);
+    #if OPT_A3
+    if (isUsermodeException) {
+    	procTable->exitcode = _MKWAIT_EXIT(exitcode);
+    } else {
+    	// if user mode exception coming from kill_curthread
+    	procTable->exitCode = _MKWAIT_SIG(exitcode);
+    }
+    #endif	// OPT_A3
   } else {
     procTable->state = ProcExited;
   }
