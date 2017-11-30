@@ -436,9 +436,9 @@ void
 as_destroy(struct addrspace *as)
 {
 	#if OPT_A3
-	kfree((vaddr_t)as->as_pbase1);
-	kfree((vaddr_t)as->as_pbase2);
-	kfree((vaddr_t)as->as_stackpbase);
+	free_kpages((vaddr_t)as->as_pbase1);
+	free_kpages((vaddr_t)as->as_pbase2);
+	free_kpages((vaddr_t)as->as_stackpbase);
 	#endif	// OPT_A3
 	kfree(as);
 }
