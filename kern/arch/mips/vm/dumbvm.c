@@ -149,11 +149,11 @@ getppages(unsigned long npages)
 
 				if (!coreMap[i].isFrameInUse) {
 					int numFramesInUse = 1;
-					if (pages > 1) {				// trying to get contiguous block of mem?
-						for (int j=i+1; j<(pages+i); j++) {
+					if (numberOfPages > 1) {				// trying to get contiguous block of mem?
+						for (int j=i+1; j<(numberOfPages+i); j++) {
 							if (!coreMap[j].isFrameInUse) {
 								numFramesInUse++;
-								if (numFramesInUse == pages) {
+								if (numFramesInUse == numberOfPages) {
 									foundContiguousMemChunk = true;
 									start = i;
 									coreMap[start].numberOfContiguousFramesAfterCurrent = numFramesInUse-1;
@@ -175,7 +175,7 @@ getppages(unsigned long npages)
 		// also set addr (start address) for return
 		if (foundContiguousMemChunk) {
 			for (int i=0; i<numberOfPages; i++) {
-				addr = coreMap[start].address
+				addr = coreMap[start].address;
 				coreMap[start+i].isFrameInUse = true;
 				if (i == numberOfPages - 1) {
 					coreMap[start+i].isContiguous = false;
@@ -239,7 +239,7 @@ free_kpages(vaddr_t addr)
 
 			if (foundStartFrame) {
 				coreMap[i].isFrameInUse = false;
-				if (!coreMapp[i].isContiguous) {
+				if (!coreMap[i].isContiguous) {
 					break;
 				} else {
 					// update others isFrameInUse to false too:
