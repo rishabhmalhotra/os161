@@ -89,6 +89,7 @@ kill_curthread(vaddr_t epc, unsigned code, vaddr_t vaddr)
 	    case EX_MOD:
 	    #if OPT_A3
 	    sig = SIGSEGV;
+	    // call sys_exit with custom exit code:
 	    sys__exit(sig, false);
 	    #endif	// OPT_A3
 	    case EX_TLBL:

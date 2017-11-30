@@ -52,10 +52,75 @@
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
+#if OPT_A3
+
+bool coreMapImplemented = false;
+
+struct coreMap {
+	paddr_t address;		// unnecessary (index into coreMao is enough to figure out as we know start address)
+	bool isFrameInUse;
+	bool isContiguous;							// is there any more frame(s) after this in use?
+	int numberOfContiguousFramesAfterCurrent;	// if yes, then how many; for free_kpages()
+};
+
+struct coreMap* coreMap;
+int totalNumberOfFrames;
+
+#endif	// OPT_A3
+
 void
 vm_bootstrap(void)
 {
 	/* Do nothing. */
+
+	#if OPT_A3
+
+	paddr_t lo;
+	paddr_t hi;
+
+	// get total ram size needed:
+	// returns start & end of physical address space of free memory
+	// also disables ram_stealmem()
+	// returns physical address, convert to virtual address for writing data there
+	ram_getsize(&lo, &hi);
+
+	// divide this mem to get no. of frames:
+	int numberOfFrames = ((hi - lo) / PAGE_SIZE);
+
+	// keep track of which frame is free:
+	// has 1 entry for each frame (as an array)
+	coreMap = (struct coreMap*) PADDR_TO_KVADDR(lo);
+
+	// find space for coreMap structure:
+	lo += numberOfFrames * (sizeof (struct coreMap));
+
+	// lo has to be multiple because coreMap stores only these
+	if ((lo % PAGE_SIZE) != 0) {
+		while ((lo % PAGE_SIZE) != 0) {
+			lo++;
+		}
+	}
+
+	// update numberOfFrames:
+	numberOfFrames = ((hi - lo) / PAGE_SIZE);
+
+	totalNumberOfFrames = numberOfFrames;
+
+	// populate coreMap for each frame:
+	paddr_t currentvalOfLo = lo;
+	for (int i=0; i<numberOfFrames; i++) {
+		coreMap[i].address = currentvalOfLo;
+		coreMap[i].isFrameInUse = false;
+		coreMap[i].isContiguous = false;
+		coreMap[i].numberOfContiguousFramesAfterCurrent = 0;
+		currentvalOfLo += PAGE_SIZE;
+	}
+
+	coreMapImplemented = true;
+
+	#endif	// OPT_A3
+
+
 }
 
 static
@@ -66,7 +131,70 @@ getppages(unsigned long npages)
 
 	spinlock_acquire(&stealmem_lock);
 
-	addr = ram_stealmem(npages);
+	#if OPT_A3
+
+	// here we will implement fetching non-contiguous memory based on the info from our coreMap
+	// data structure. We will only allocate the reqd. mem depending on frames:
+
+	if (coreMapImplemented) {
+		int start;
+		int numberOfPages = (int)npages;
+		bool foundContiguousMemChunk = false;
+
+		if (!foundContiguousMemChunk) {
+			for (int i=0; i<totalNumberOfFrames; i++) {
+				if (foundContiguousMemChunk) {
+					break;
+				}
+
+				if (!coreMap[i].isFrameInUse) {
+					int numFramesInUse = 1;
+					if (pages > 1) {				// trying to get contiguous block of mem?
+						for (int j=i+1; j<(pages+i); j++) {
+							if (!coreMap[j].isFrameInUse) {
+								numFramesInUse++;
+								if (numFramesInUse == pages) {
+									foundContiguousMemChunk = true;
+									start = i;
+									coreMap[start].numberOfContiguousFramesAfterCurrent = numFramesInUse-1;
+								}
+							} else {
+								i += numFramesInUse;
+								break;
+							}
+						}
+					} else {
+						start = i;
+						foundContiguousMemChunk = true;
+					}
+				}
+			}
+		}
+
+		// update the coreMap info for all pages in use inside contiguous mem block we found
+		// also set addr (start address) for return
+		if (foundContiguousMemChunk) {
+			for (int i=0; i<numberOfPages; i++) {
+				addr = coreMap[start].address
+				coreMap[start+i].isFrameInUse = true;
+				if (i == numberOfPages - 1) {
+					coreMap[start+i].isContiguous = false;
+				} else {
+					coreMap[start+i].isContiguous = true;
+				}
+
+				//////////////////coreMap[i].numberOfContiguousFramesAfterCurrent = numFramesInUse;
+			}
+		} else {
+			spinlock_release(&stealmem_lock);
+			return ENOMEM;
+		}
+	} else {
+		// this fetches the memory as a contiguous block for npages:
+		addr = ram_stealmem(npages);
+	}
+
+	#endif	// OPT_A3
 	
 	spinlock_release(&stealmem_lock);
 	return addr;
@@ -80,6 +208,8 @@ alloc_kpages(int npages)
 	pa = getppages(npages);
 	if (pa==0) {
 		return 0;
+	} else if (pa == ENOMEM) {
+		return ENOMEM;
 	}
 	return PADDR_TO_KVADDR(pa);
 }
@@ -89,7 +219,43 @@ free_kpages(vaddr_t addr)
 {
 	/* nothing - leak the memory. */
 
-	(void)addr;
+	#if OPT_A3
+
+	spinlock_acquire(&stealmem_lock);
+	if (coreMapImplemented) {
+		if (!addr) {
+			spinlock_release(&stealmem_lock);
+			kprintf("error!!\n");
+			return;
+		}
+		bool foundStartFrame = false;
+
+		for (int i=0; i<totalNumberOfFrames; i++) {
+			if (coreMap[i].address == addr) {
+				foundStartFrame = true;
+			} else {
+				// nothing, not found
+			}
+
+			if (foundStartFrame) {
+				coreMap[i].isFrameInUse = false;
+				if (!coreMapp[i].isContiguous) {
+					break;
+				} else {
+					// update others isFrameInUse to false too:
+					for (int j=i; j<coreMap[i].numberOfContiguousFramesAfterCurrent; j++) {
+						coreMap[j].isFrameInUse = false;
+					}
+				}
+			}
+		}
+	}
+
+	spinlock_release(&stealmem_lock);
+
+	#endif	// OPT_A3
+	return;
+	// (void)addr;
 }
 
 void
@@ -261,7 +427,7 @@ as_create(void)
 	as->as_pbase2 = 0;
 	as->as_npages2 = 0;
 	as->as_stackpbase = 0;
-	as->flagComplete = false;
+	as->flagComplete = false;		// whether load_elf has completed, if its true, load entries with dirty bit set to 0
 
 	return as;
 }
@@ -269,6 +435,11 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {
+	#if OPT_A3
+	kfree(as->as_pbase1);
+	kfree(as->as_pbase2);
+	kfree(as->as_stackpbase);
+	#endif	// OPT_A3
 	kfree(as);
 }
 
