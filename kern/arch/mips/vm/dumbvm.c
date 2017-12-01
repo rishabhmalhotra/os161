@@ -65,7 +65,7 @@ struct coreMapMappingAndFrameInfo {
 
 struct coreMap {
 	// array of coreMapMappings:
-	struct coreMapMappingAndFrameInfo* coreMapMappingAndFrameInfo;
+	struct coreMapMappingAndFrameInfo* coreMapMappingAndFrameInfoArray;
 };
 
 struct coreMapMappingAndFrameInfo* arrayOfMappings;
@@ -98,8 +98,8 @@ vm_bootstrap(void)
 	// keep track of which frame is free:
 	// has 1 entry for each frame (as an array)
 	coreMap = (struct coreMap*) PADDR_TO_KVADDR(lo);
-	coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
-	coreMap->coreMapMappingAndFrameInfo = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
+	coreMap->coreMapMappingAndFrameInfoArray = arrayOfMappings;
+	coreMap->coreMapMappingAndFrameInfoArray[0] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
 	lo += numberOfFrames * (sizeof (struct coreMap));
@@ -120,11 +120,11 @@ vm_bootstrap(void)
 	// populate coreMap for each frame:
 	paddr_t currentvalOfLo = lo;
 	for (int i=0; i<numberOfFrames; i++) {
-		coreMap->coreMapMappingAndFrameInfo[i] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo * (i + 1));
-		coreMap->coreMapMappingAndFrameInfo[i].address = currentvalOfLo;
-		coreMap->coreMapMappingAndFrameInfo[i].isFrameInUse = false;
-		coreMap->coreMapMappingAndFrameInfo[i].isContiguous = false;
-		coreMap->coreMapMappingAndFrameInfo[i].numberOfContiguousFramesAfterCurrent = 0;
+		coreMap->coreMapMappingAndFrameInfoArray[i] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo * (i + 1));
+		coreMap->coreMapMappingAndFrameInfoArray[i].address = currentvalOfLo;
+		coreMap->coreMapMappingAndFrameInfoArray[i].isFrameInUse = false;
+		coreMap->coreMapMappingAndFrameInfoArray[i].isContiguous = false;
+		coreMap->coreMapMappingAndFrameInfoArray[i].numberOfContiguousFramesAfterCurrent = 0;
 		currentvalOfLo += PAGE_SIZE;
 	}
 
@@ -159,16 +159,16 @@ getppages(unsigned long npages)
 					break;
 				}
 
-				if (!coreMap->coreMapMappingAndFrameInfo[i].isFrameInUse) {
+				if (!coreMap->coreMapMappingAndFrameInfoArray[i].isFrameInUse) {
 					int numFramesInUse = 1;
 					if (numberOfPages > 1) {				// trying to get contiguous block of mem?
 						for (int j=i+1; j<(numberOfPages+i); j++) {
-							if (!coreMap->coreMapMappingAndFrameInfo[j].isFrameInUse) {
+							if (!coreMap->coreMapMappingAndFrameInfoArray[j].isFrameInUse) {
 								numFramesInUse++;
 								if (numFramesInUse == numberOfPages) {
 									foundContiguousMemChunk = true;
 									start = i;
-									coreMap->coreMapMappingAndFrameInfo[start].numberOfContiguousFramesAfterCurrent = numFramesInUse-1;
+									coreMap->coreMapMappingAndFrameInfoArray[start].numberOfContiguousFramesAfterCurrent = numFramesInUse-1;
 								}
 							} else {
 								// skip the contiguous block
@@ -188,12 +188,12 @@ getppages(unsigned long npages)
 		// also set addr (start address) for return
 		if (foundContiguousMemChunk) {
 			for (int i=0; i<numberOfPages; i++) {
-				addr = coreMap->coreMapMappingAndFrameInfo[start].address;
-				coreMap->coreMapMappingAndFrameInfo[start+i].isFrameInUse = true;
+				addr = coreMap->coreMapMappingAndFrameInfoArray[start].address;
+				coreMap->coreMapMappingAndFrameInfoArray[start+i].isFrameInUse = true;
 				if (i == numberOfPages - 1) {
-					coreMap->coreMapMappingAndFrameInfo[start+i].isContiguous = false;
+					coreMap->coreMapMappingAndFrameInfoArray[start+i].isContiguous = false;
 				} else {
-					coreMap->coreMapMappingAndFrameInfo[start+i].isContiguous = true;
+					coreMap->coreMapMappingAndFrameInfoArray[start+i].isContiguous = true;
 				}
 
 				// coreMap->coreMapMappingAndFrameInfo[i].numberOfContiguousFramesAfterCurrent = numFramesInUse;
@@ -244,20 +244,20 @@ free_kpages(vaddr_t addr)
 		bool foundStartFrame = false;
 
 		for (int i=0; i<totalNumberOfFrames; i++) {
-			if (coreMap->coreMapMappingAndFrameInfo[i].address == addr) {
+			if (coreMap->coreMapMappingAndFrameInfoArray[i].address == addr) {
 				foundStartFrame = true;
 			} else {
 				// nothing, not found
 			}
 
 			if (foundStartFrame) {
-				coreMap->coreMapMappingAndFrameInfo[i].isFrameInUse = false;
-				if (!coreMap->coreMapMappingAndFrameInfo[i].isContiguous) {
+				coreMap->coreMapMappingAndFrameInfoArray[i].isFrameInUse = false;
+				if (!coreMap->coreMapMappingAndFrameInfoArray[i].isContiguous) {
 					break;
 				} else {
 					// update isFrameInUse to false for all mappings in contiguous block:
-					for (int j=i; j<coreMap->coreMapMappingAndFrameInfo[i].numberOfContiguousFramesAfterCurrent; j++) {
-						coreMap->coreMapMappingAndFrameInfo[j].isFrameInUse = false;
+					for (int j=i; j<coreMap->coreMapMappingAndFrameInfoArray[i].numberOfContiguousFramesAfterCurrent; j++) {
+						coreMap->coreMapMappingAndFrameInfoArray[j].isFrameInUse = false;
 					}
 				}
 			}
