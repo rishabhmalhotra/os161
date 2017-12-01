@@ -102,7 +102,7 @@ vm_bootstrap(void)
 	coreMap->coreMapMappingAndFrameInfo = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
-	lo += numberOfFrames * (sizeof (struct coreMap));
+	lo += numberOfFrames * ((sizeof (struct coreMap)) + (sizeof (struct coreMapMappingAndFrameInfo)))*12;
 
 	// lo has to be multiple because coreMap stores only these
 	if ((lo % PAGE_SIZE) != 0) {
