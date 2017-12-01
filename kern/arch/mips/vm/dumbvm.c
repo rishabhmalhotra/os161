@@ -98,7 +98,7 @@ vm_bootstrap(void)
 	// has 1 entry for each frame (as an array)
 	struct coreMapMappingAndFrameInfo* arrayOfMappings;
 	coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
-	coreMap->coreMapMappingAndFrameInfo[0] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
+	coreMap->coreMapMappingAndFrameInfo = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
 	lo += numberOfFrames * (sizeof (struct coreMap));
