@@ -96,7 +96,7 @@ vm_bootstrap(void)
 
 	// keep track of which frame is free:
 	// has 1 entry for each frame (as an array)
-	coreMap = (struct coreMap*) PADDR_TO_KVADDR(lo);
+	coreMap->coreMapMappingAndFrameInfo[0] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
 	lo += numberOfFrames * (sizeof (struct coreMap));
@@ -116,9 +116,7 @@ vm_bootstrap(void)
 	// populate coreMap for each frame:
 	paddr_t currentvalOfLo = lo;
 	for (int i=0; i<numberOfFrames; i++) {
-		kprintf("lol1\n");
 		coreMap->coreMapMappingAndFrameInfo[i].address = currentvalOfLo;
-		kprintf("lolafter1\n");
 		coreMap->coreMapMappingAndFrameInfo[i].isFrameInUse = false;
 		coreMap->coreMapMappingAndFrameInfo[i].isContiguous = false;
 		coreMap->coreMapMappingAndFrameInfo[i].numberOfContiguousFramesAfterCurrent = 0;
