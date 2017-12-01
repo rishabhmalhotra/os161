@@ -97,8 +97,8 @@ vm_bootstrap(void)
 	// keep track of which frame is free:
 	// has 1 entry for each frame (as an array)
 	struct coreMapMappingAndFrameInfo* arrayOfMappings;
+	arrayOfMappings = (struct arrayOfMappings*) PADDR_TO_KVADDR(lo);
 	coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
-	coreMap = (struct coreMap*) PADDR_TO_KVADDR(lo);
 	coreMap->coreMapMappingAndFrameInfo = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
