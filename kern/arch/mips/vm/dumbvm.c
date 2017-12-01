@@ -96,7 +96,7 @@ vm_bootstrap(void)
 
 	// keep track of which frame is free:
 	// has 1 entry for each frame (as an array)
-	coreMap = (struct coreMap*) PADDR_TO_KVADDR(lo);
+	coreMap[0]->coreMapMappingAndFrameInfo = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
 	lo += numberOfFrames * (sizeof (struct coreMap));
@@ -250,7 +250,7 @@ free_kpages(vaddr_t addr)
 				if (!coreMap->coreMapMappingAndFrameInfo[i].isContiguous) {
 					break;
 				} else {
-					// update others isFrameInUse to false too:
+					// update isFrameInUse to false for all mappings in contiguous block:
 					for (int j=i; j<coreMap->coreMapMappingAndFrameInfo[i].numberOfContiguousFramesAfterCurrent; j++) {
 						coreMap->coreMapMappingAndFrameInfo[j].isFrameInUse = false;
 					}
