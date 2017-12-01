@@ -63,12 +63,15 @@ struct coreMapMappingAndFrameInfo {
 	int numberOfContiguousFramesAfterCurrent;	// if yes, then how many; for free_kpages()
 };
 
+struct coreMapMappingAndFrameInfo* arrayOfMappings;
+
 struct coreMap {
 	// array of coreMapMappings:
 	struct coreMapMappingAndFrameInfo* coreMapMappingAndFrameInfo;
 };
 
 struct coreMap* coreMap;
+coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
 // struct coreMapMappingAndFrameInfo* arrayOfMappings;
 // coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
 int totalNumberOfFrames;
@@ -96,7 +99,7 @@ vm_bootstrap(void)
 
 	// keep track of which frame is free:
 	// has 1 entry for each frame (as an array)
-	coreMap->coreMapMappingAndFrameInfo[0] = (struct coreMap*) PADDR_TO_KVADDR(lo);
+	coreMap->coreMapMappingAndFrameInfo[0] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
 	lo += numberOfFrames * (sizeof (struct coreMap));
