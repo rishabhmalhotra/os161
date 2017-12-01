@@ -70,7 +70,7 @@ struct coreMap {
 
 struct coreMap* coreMap;
 struct coreMapMappingAndFrameInfo* arrayOfMappings;
-coreMap.coreMapMappingAndFrameInfo = arrayOfMappings;
+coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
 int totalNumberOfFrames;
 
 #endif	// OPT_A3
