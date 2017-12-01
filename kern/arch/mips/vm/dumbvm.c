@@ -66,11 +66,11 @@ struct coreMapMappingAndFrameInfo {
 struct coreMap {
 	// array of coreMapMappings:
 	struct coreMapMappingAndFrameInfo* coreMapMappingAndFrameInfo;
-}
+};
 
 struct coreMap* coreMap;
 struct coreMapMappingAndFrameInfo* arrayOfMappings;
-coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
+coreMap.coreMapMappingAndFrameInfo = arrayOfMappings;
 int totalNumberOfFrames;
 
 #endif	// OPT_A3
