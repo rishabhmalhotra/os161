@@ -68,6 +68,7 @@ struct coreMap {
 	struct coreMapMappingAndFrameInfo* coreMapMappingAndFrameInfo;
 };
 
+struct coreMapMappingAndFrameInfo* arrayOfMappings;
 struct coreMap* coreMap;
 // struct coreMapMappingAndFrameInfo* arrayOfMappings;
 // coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
@@ -96,10 +97,8 @@ vm_bootstrap(void)
 
 	// keep track of which frame is free:
 	// has 1 entry for each frame (as an array)
-	struct coreMapMappingAndFrameInfo* arrayOfMappings;
-	arrayOfMappings = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 	coreMap->coreMapMappingAndFrameInfo = arrayOfMappings;
-	coreMap->coreMapMappingAndFrameInfo = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
+	coreMap->coreMapMappingAndFrameInfo[0] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
 	lo += numberOfFrames * (sizeof (struct coreMap));
