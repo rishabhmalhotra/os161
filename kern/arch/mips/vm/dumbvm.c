@@ -59,7 +59,7 @@ bool coreMapImplemented = false;
 struct coreMapMappingAndFrameInfo {
 	paddr_t address;		// unnecessary (index into coreMap is enough to figure out as we know start address)
 	bool isFrameInUse;
-	bool isContiguous;							// is there any more frame(s) after this in use?
+	bool isContiguous;							// is there any more frame(s) after this in a block?
 	int numberOfContiguousFramesAfterCurrent;	// if yes, then how many; for free_kpages()
 };
 
@@ -96,7 +96,7 @@ vm_bootstrap(void)
 
 	// keep track of which frame is free:
 	// has 1 entry for each frame (as an array)
-	coreMap->coreMapMappingAndFrameInfo[0] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
+	coreMap->coreMapMappingAndFrameInfo[0] = (struct coreMap*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
 	lo += numberOfFrames * (sizeof (struct coreMap));
