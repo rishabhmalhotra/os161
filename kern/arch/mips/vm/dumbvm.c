@@ -65,7 +65,7 @@ struct coreMapMappingAndFrameInfo {
 
 struct coreMap {
 	// array of coreMapMappings:
-	coreMapMappingAndFrameInfo* coreMapMappingAndFrameInfo;
+	struct coreMapMappingAndFrameInfo* coreMapMappingAndFrameInfo;
 }
 
 struct coreMap* coreMap;
