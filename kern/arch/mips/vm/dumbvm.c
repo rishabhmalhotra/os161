@@ -118,7 +118,7 @@ vm_bootstrap(void)
 	// populate coreMap for each frame:
 	paddr_t currentvalOfLo = lo;
 	for (int i=0; i<numberOfFrames; i++) {
-		coreMap->coreMapMappingAndFrameInfoArray[i] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo * (i + 1));
+		// coreMap->coreMapMappingAndFrameInfoArray[i] = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo * (i + 1));
 		coreMap->coreMapMappingAndFrameInfoArray[i].address = currentvalOfLo;
 		coreMap->coreMapMappingAndFrameInfoArray[i].isFrameInUse = false;
 		coreMap->coreMapMappingAndFrameInfoArray[i].isContiguous = false;
