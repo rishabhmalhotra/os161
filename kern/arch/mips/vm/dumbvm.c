@@ -108,9 +108,6 @@ vm_bootstrap(void)
 	// lo has to be multiple because coreMap stores only these
 	if ((lo % PAGE_SIZE) != 0) {
 		lo = ROUNDUP(lo, PAGE_SIZE);
-		// while ((lo % PAGE_SIZE) != 0) {
-		// 	lo++;
-		// }
 	}
 
 	// update numberOfFrames:
@@ -184,6 +181,7 @@ getppages(unsigned long npages)
 				}
 			}
 		}
+		
 
 		// update the coreMapMapping info for all pages in use inside contiguous mem block we found
 		// also set addr (start address) for return
