@@ -97,7 +97,7 @@ vm_bootstrap(void)
 	// keep track of which frame is free:
 	// has 1 entry for each frame (as an array)
 	coreMap = (struct coreMap*) PADDR_TO_KVADDR(lo);
-	lo += PAGE_SIZE;
+	lo += ROUNDUP(sizeof(struct coreMapMappingAndFrameInfo), PAGE_SIZE);
 	coreMap->coreMapMappingAndFrameInfoArray = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo);
 
 	// find space for coreMap structure:
