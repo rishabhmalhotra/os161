@@ -99,6 +99,8 @@ vm_bootstrap(void)
 	coreMap = (struct coreMap*) PADDR_TO_KVADDR(lo);
 	coreMap->coreMapMappingAndFrameInfoArray = (struct coreMapMappingAndFrameInfo*) PADDR_TO_KVADDR(lo+PAGE_SIZE);
 
+	lo += (lo + PAGE_SIZE);
+
 	// find space for coreMap structure:
 	lo += numberOfFrames * (sizeof (struct coreMap));
 
