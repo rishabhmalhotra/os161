@@ -181,7 +181,7 @@ getppages(unsigned long npages)
 				}
 			}
 		}
-		
+
 
 		// update the coreMapMapping info for all pages in use inside contiguous mem block we found
 		// also set addr (start address) for return
@@ -302,7 +302,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	    case VM_FAULT_READONLY:
 		/* We always create pages read-write, so we can't get this */
 		#if OPT_A3
-		return 1;
+		return 1;			// or 10
 		// panic("dumbvm: got VM_FAULT_READONLY\n");
 		#endif	// OPT_A3
 	    case VM_FAULT_READ:
